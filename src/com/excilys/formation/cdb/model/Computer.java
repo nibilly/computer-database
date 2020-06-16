@@ -63,21 +63,33 @@ public class Computer {
 		this.name = name;
 		this.introduced = introduced;
 		this.discontinued = discontinued;
-		Company company = DAOCompany.findById(companyId);
+		Company company;
+		try {
+			company = DAOCompany.findById(companyId);
+		} catch (NoResultException e) {
+			company = null;
+		}
 		this.company = company;
 	}
 
 	/**
-	 * Create from software, go find the company from companyId
+	 * select from software(without id), go find the company from companyId
 	 */
 	public Computer(String name, Date introduced, Date discontinued, long companyId) {
 		super();
 		this.name = name;
 		this.introduced = introduced;
 		this.discontinued = discontinued;
-		Company company = DAOCompany.findById(companyId);
+		Company company;
+		try {
+			company = DAOCompany.findById(companyId);
+		} catch (NoResultException e) {
+			company = null;
+		}
 		this.company = company;
 	}
+	
+	
 
 	@Override
 	public String toString() {

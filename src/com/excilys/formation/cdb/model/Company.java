@@ -26,13 +26,6 @@ public class Company {
 		this.id = id;
 		this.name = name;
 	}
-	/**
-	 * Create from software
-	 */
-	public Company(String name) {
-		super();
-		this.name = name;
-	}
 	@Override
 	public String toString() {
 		return "Company [id=" + id + ", name=" + name + "]";

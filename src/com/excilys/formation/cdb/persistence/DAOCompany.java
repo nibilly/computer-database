@@ -7,7 +7,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.excilys.formation.cdb.mapper.CompanyMapper;
 import com.excilys.formation.cdb.model.Company;
+import com.excilys.formation.cdb.model.NoResultException;
 
 public class DAOCompany {
 	private static List<Company> companies = null;
@@ -20,9 +22,7 @@ public class DAOCompany {
 			statement = connection.createStatement();
 			ResultSet resultSet = statement.executeQuery("select * from company;");
 			while(resultSet.next()) {
-				long id = resultSet.getLong("id");
-				String name = resultSet.getString("name");
-				Company company = new Company(id, name);
+				Company company = CompanyMapper.mapSQLToCompany(resultSet);
 				companies.add(company);
 			}
 		} catch (SQLException e) {
@@ -31,7 +31,7 @@ public class DAOCompany {
 		return companies;
 	}
 
-	public static Company findById(long companyId) {
+	public static Company findById(long companyId) throws NoResultException {
 		Company company = null;
 		if(companies!=null)
 		{
@@ -44,11 +44,11 @@ public class DAOCompany {
 			try {
 				statement = connection.createStatement();
 				ResultSet resultSet = statement.executeQuery("select * from company where id = " + companyId + ";");
-				while(resultSet.next()) {
-					long id = resultSet.getLong("id");
-					String name = resultSet.getString("name");
-					company = new Company(id, name);
-					companies.add(company);
+				if(resultSet.next()) {
+					company = CompanyMapper.mapSQLToCompany(resultSet);
+				}
+				else {
+					throw new NoResultException();
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
