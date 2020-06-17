@@ -2,35 +2,28 @@ package com.excilys.formation.cdb.model;
 
 import java.util.List;
 
-import com.excilys.formation.cdb.persistence.DAOComputer;
-
 /**
  * a computer page for pagination
  * @author nbilly
  *
  */
-public class Page {
+public class Page<T> {
 	/**
-	 * number total of computers
+	 * number of rows per list
 	 */
-	private static int nbTotalComputers;
+	private static final int NB_ROWS_RETURNED = 10;
 	/**
 	 * this page number
 	 */
 	private int pageNumber;
 	/**
-	 * computers
+	 * list of T
 	 */
-	private List<Computer> computers;
-
-	public static int getNbTotalComputers() {
-		nbTotalComputers = DAOComputer.getNbComputers();
-		return nbTotalComputers;
-	}
-
-	public static void setNbTotalComputers(int nbTotalComputers) {
-		Page.nbTotalComputers = nbTotalComputers;
-	}
+	private List<T> entities;
+	/**
+	 * number of rows jumped (offset)
+	 */
+	private int nbRowsJumped;
 
 	public int getPageNumber() {
 		return pageNumber;
@@ -40,26 +33,38 @@ public class Page {
 		this.pageNumber = pageNumber;
 	}
 
-	public List<Computer> getComputers() {
-		return computers;
+	public List<T> getEntities() {
+		return entities;
 	}
 
-	public void setComputers(List<Computer> computers) {
-		this.computers = computers;
+	public void setEntities(List<T> entities) {
+		this.entities = entities;
+	}
+	
+	
+
+	public int getNbRowsJumped() {
+		return nbRowsJumped;
+	}
+
+	public void setNbRowsJumped(int nbRowsJumped) {
+		this.nbRowsJumped = nbRowsJumped;
+	}
+
+	public static int getNbRowsReturned() {
+		return NB_ROWS_RETURNED;
 	}
 
 	public Page() {
 
 	}
-	
-	/**
-	 * Create a page
-	 * @param pageNumber
-	 * @param computers
-	 */
-	public Page(int pageNumber, List<Computer> computers) {
+
+	public Page(int pageNumber, int nbRowsJumped) {
+		super();
 		this.pageNumber = pageNumber;
-		this.computers = computers;
+		this.nbRowsJumped = nbRowsJumped;
 	}
+
+	
 
 }

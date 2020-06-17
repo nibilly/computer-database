@@ -10,6 +10,7 @@ import java.util.List;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.NoResultException;
+import com.excilys.formation.cdb.model.Page;
 
 /**
  * SQL computer table access manager 
@@ -58,11 +59,9 @@ public class DAOComputer {
 	
 	/**
 	 * look for computers with pagination
-	 * @param nbRowsJumped
-	 * @param nbRowsReturned
-	 * @return computers in a range
+	 * @param page the page have number of rows jumped and number of rowd returned. Also the list of computers is returned by page.entities.
 	 */
-	public static List<Computer> findComputersBetween(int nbRowsJumped, int nbRowsReturned) {
+	public static void findComputersPages(Page<Computer> page) {
 		List<Computer> computers;
 		Connection connection = CDBConnection.getConnection();
 		computers = new ArrayList<Computer>();
@@ -71,7 +70,7 @@ public class DAOComputer {
 			statement = connection.createStatement();
 			StringBuffer stringBuffer = new StringBuffer();
 			stringBuffer.append("select * from computer");
-			stringBuffer.append(" limit ").append(nbRowsJumped).append(",").append(nbRowsReturned).append(";");
+			stringBuffer.append(" limit ").append(page.getNbRowsJumped()).append(",").append(Page.getNbRowsReturned()).append(";");
 			ResultSet resultSet = statement.executeQuery(stringBuffer.toString());
 			while(resultSet.next()) {
 				Computer computer = ComputerMapper.mapSQLToJava(resultSet);
@@ -80,7 +79,7 @@ public class DAOComputer {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return computers;
+		page.setEntities(computers);
 	}
 
 	/**

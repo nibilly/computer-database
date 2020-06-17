@@ -48,6 +48,7 @@ public class CDBConnection {
 			try {
 				Class.forName("com.mysql.cj.jdbc.Driver");
 				connection.close();
+				connection = null;
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {

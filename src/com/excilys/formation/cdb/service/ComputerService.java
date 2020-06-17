@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.NoResultException;
+import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.persistence.DAOComputer;
 
 /**
@@ -30,16 +31,14 @@ public class ComputerService {
 	}
 
 	public static List<Computer> findAll() {
-		List<Computer> computers = DAOComputer.findAll();
-		return computers;
+		return DAOComputer.findAll();
 	}
 
-	public static List<Computer> findComputersBetween(int nbRowsJumped, int nbRowsReturned) {
-		return DAOComputer.findComputersBetween(nbRowsJumped, nbRowsReturned);
+	public static void findComputersPages(Page<Computer> page) {
+		DAOComputer.findComputersPages(page);
 	}
 	
 	public static int getNbComputers() {
-		int nbTotalComputers = DAOComputer.getNbComputers();
-		return nbTotalComputers;
+		return DAOComputer.getNbComputers();
 	}
 }
