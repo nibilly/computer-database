@@ -6,7 +6,18 @@ import java.sql.SQLException;
 
 import com.excilys.formation.cdb.model.Computer;
 
+/**
+ * Map a Computer from different types
+ * @author nbilly
+ *
+ */
 public class ComputerMapper {
+	/**
+	 * Take sql request result and return the company correspondent
+	 * @param resultSet
+	 * @return
+	 * @throws SQLException
+	 */
 	public static Computer mapSQLToJava(ResultSet resultSet) throws SQLException {
 		long id = resultSet.getLong("id");
 		String name = resultSet.getString("name");

@@ -1,5 +1,10 @@
 package com.excilys.formation.cdb.model;
 
+/**
+ * Exception throwable when there is no SQL result
+ * @author nbilly
+ *
+ */
 @SuppressWarnings("serial")
 public class NoResultException extends Exception {
 

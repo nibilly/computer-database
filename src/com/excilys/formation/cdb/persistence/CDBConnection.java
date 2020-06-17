@@ -11,8 +11,15 @@ import java.sql.SQLException;
  */
 public class CDBConnection {
 
+	/**
+	 * JDBC connection
+	 */
 	private static Connection connection;
 
+	/**
+	 * if null or closed then create a JDBC connection
+	 * @return
+	 */
 	public static Connection getConnection() {
 		try {
 			if(connection == null || connection.isClosed()) {
@@ -31,7 +38,12 @@ public class CDBConnection {
 		return connection;
 	}
 
-	public static void CloseConnection() {
+	/**
+	 * Close connection
+	 */
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
 		if(connection != null) {
 			try {
 				Class.forName("com.mysql.cj.jdbc.Driver");

@@ -8,26 +8,28 @@ import java.util.Scanner;
 import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.NoResultException;
+import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.service.CompanyService;
 import com.excilys.formation.cdb.service.ComputerService;
 
+/**
+ * Command Line Interface
+ * @author nbilly
+ *
+ */
 public class CLI {
 	private static boolean continuer;
 	private static Scanner scanner;
 	private static SimpleDateFormat simpleDateFormat;
-	private static CompanyService companyService;
-	private static ComputerService computerService;
 
 	/**
-	 * Create a scanner, while user continue to respond call menu else close scanner and possible BD connection
+	 * Create a scanner, while user continue to respond call menu else close scanner
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		simpleDateFormat.setLenient(false);
 		scanner = new Scanner(System.in);
-		companyService = new CompanyService();
-		computerService = new ComputerService();
 		continuer = true;
 		while(continuer) {
 			menu();
@@ -83,7 +85,7 @@ public class CLI {
 	private static void deleteComputer() {
 		System.out.println("-Delete a computer--");
 		long computerId = askComputerId();// this method already ask for validation
-		computerService.deleteComputerById(computerId);		
+		ComputerService.deleteComputerById(computerId);		
 	}
 
 	private static void updateComputer() {
@@ -92,13 +94,13 @@ public class CLI {
 		System.out.println("New informations for this computer: ");
 		Computer computer = askComputerInformations();
 		computer.setId(computerId);
-		computerService.updateComputer(computer);
+		ComputerService.updateComputer(computer);
 	}
 
 	private static void createComputer() {
 		System.out.println("-Create a computer--");
 		Computer computer = askComputerInformations();
-		computerService.createComputer(computer);
+		ComputerService.createComputer(computer);
 	}
 
 	/**
@@ -180,7 +182,7 @@ public class CLI {
 				}
 			}while(!parsing);
 			try {
-				computer = computerService.findById(computerIdLong);
+				computer = ComputerService.findById(computerIdLong);
 			} catch (NoResultException e) {
 				System.out.println("computer doesn't exist");
 				computerExist = false;
@@ -206,36 +208,63 @@ public class CLI {
 		System.out.println("---List computers---");
 		int nbRowsJumped = 0;
 		int nbRowsReturned = 10;
+		int actualPage = 1;
 		List<Computer> computers;
 		boolean continuer = true;
+		// Page display
 		do {
-			computers = computerService.findComputersBetween(nbRowsJumped, nbRowsReturned);
-			if(computers.size()<nbRowsReturned) {
-				continuer = false;
-			}
+			computers = ComputerService.findComputersBetween(nbRowsJumped, nbRowsReturned);
 			for (Computer computer : computers) {
 				StringBuffer stringBuffer = new StringBuffer();
 				stringBuffer.append("Computer [id=").append(computer.getId()).append(", name=").append(computer.getName()).append("]");
 				System.out.println(stringBuffer.toString());
 			}
-			System.out.println();
-			if(continuer) {
-				System.out.print("Next (O/n)?");
-				String next = scanner.nextLine();
-				if(next.compareTo("n")==0){
+			int pageRequested=0;
+			// Page request
+			do {
+				int nbComputers = Page.getNbTotalComputers();
+				int nbPages = nbComputers/nbRowsReturned;
+				if((nbComputers%nbRowsReturned)>0) {
+					nbPages++;
+				}
+				System.out.print("Page " + actualPage + "/" +nbPages);
+				System.out.print(". Which page do you want ('n' for next, '0' to stop or a number)?");
+				String page = scanner.nextLine();
+				if(page.compareTo("0")==0) {
 					continuer = false;
 				}
+				else {
+					if(page.compareTo("n")==0) {
+						pageRequested = actualPage+1;
+					}
+					else {
+						try {
+							pageRequested = Integer.parseInt(page);
+							if(pageRequested < 1 || pageRequested > nbPages) {
+								System.out.println("Incorrect page number");
+								pageRequested = 0;
+							}
+						}
+						catch(NumberFormatException e){
+							System.out.println("Incorrect page number");
+						}
+					}
+				}
 			}
-			nbRowsJumped += nbRowsReturned;
+			while (pageRequested == 0 && continuer);
+			if(continuer) {
+				actualPage = pageRequested;
+				nbRowsJumped = nbRowsReturned * (pageRequested-1);
+			}
 			System.out.println();
 		}
 		while(continuer);
-		System.out.println("END");
+		System.out.println("END of listing");
 	}
 
 	private static void companyListing() {
 		System.out.println("---List companies---");
-		List<Company> companies = companyService.findAll();
+		List<Company> companies = CompanyService.findAll();
 		for (Company company : companies) {
 			System.out.println(company);
 		}

@@ -1,7 +1,18 @@
 package com.excilys.formation.cdb.model;
 
+/**
+ * A company products Computers
+ * @author nbilly
+ *
+ */
 public class Company {
+	/**
+	 * identification
+	 */
 	private long id;
+	/**
+	 * complete computer name
+	 */
 	private String name;
 	
 	public long getId() {

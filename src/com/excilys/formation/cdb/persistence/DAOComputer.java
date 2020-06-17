@@ -11,10 +11,19 @@ import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.NoResultException;
 
+/**
+ * SQL computer table access manager 
+ * @author nbilly
+ *
+ */
 public class DAOComputer {
-	private static List<Computer> computers;
 
+	/**
+	 * look for all computers
+	 * @return computers
+	 */
 	public static List<Computer> findAll() {
+		List<Computer> computers;
 		Connection connection = CDBConnection.getConnection();
 		computers = new ArrayList<Computer>();
 		Statement statement;
@@ -31,7 +40,30 @@ public class DAOComputer {
 		return computers;
 	}
 	
+	public static int getNbComputers() {
+		Connection connection = CDBConnection.getConnection();
+		Statement statement;
+		int nbComputers = 0;
+		try {
+			statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery("select count(*) from computer;");
+			if(resultSet.next()) {
+				nbComputers = resultSet.getInt("count(*)");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return nbComputers;
+	}
+	
+	/**
+	 * look for computers with pagination
+	 * @param nbRowsJumped
+	 * @param nbRowsReturned
+	 * @return computers in a range
+	 */
 	public static List<Computer> findComputersBetween(int nbRowsJumped, int nbRowsReturned) {
+		List<Computer> computers;
 		Connection connection = CDBConnection.getConnection();
 		computers = new ArrayList<Computer>();
 		Statement statement;
@@ -51,28 +83,27 @@ public class DAOComputer {
 		return computers;
 	}
 
+	/**
+	 * look for one computer
+	 * @param computerId
+	 * @return a computer
+	 * @throws NoResultException
+	 */
 	public static Computer findById(long computerId) throws NoResultException {
 		Computer computer = null;
-		if(computers!=null)
-		{
-			computer = computers.stream().filter(c->c.getId() == computerId).findAny().orElse(null);
-		}
-		if (computer==null) {
-			Connection connection = CDBConnection.getConnection();
-			computers = new ArrayList<Computer>();
-			Statement statement;
-			try {
-				statement = connection.createStatement();
-				ResultSet resultSet = statement.executeQuery("select * from computer where id = " + computerId + ";");
-				if(resultSet.next()) {
-					computer = ComputerMapper.mapSQLToJava(resultSet);
-				}
-				else {
-					throw new NoResultException();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
+		Connection connection = CDBConnection.getConnection();
+		Statement statement;
+		try {
+			statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery("select * from computer where id = " + computerId + ";");
+			if(resultSet.next()) {
+				computer = ComputerMapper.mapSQLToJava(resultSet);
 			}
+			else {
+				throw new NoResultException();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return computer;
 	}

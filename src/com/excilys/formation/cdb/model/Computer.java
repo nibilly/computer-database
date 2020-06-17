@@ -4,11 +4,31 @@ import java.sql.Date;
 
 import com.excilys.formation.cdb.persistence.DAOCompany;
 
+/**
+ * A computer products by a Company
+ * @author nbilly
+ *
+ */
 public class Computer {
+	/**
+	 * identification
+	 */
 	private long id;
+	/**
+	 * complete name
+	 */
 	private String name;
+	/**
+	 * when this computer can be buy in market
+	 */
 	private Date introduced;
+	/**
+	 * when this computer cannot be buy in market
+	 */
 	private Date discontinued;
+	/**
+	 * a computer is produced by a company
+	 */
 	private Company company;
 	
 	public long getId() {
@@ -56,6 +76,11 @@ public class Computer {
 
 	/**
 	 * select from BD, go find the company from companyId
+	 * @param id
+	 * @param name
+	 * @param introduced
+	 * @param discontinued
+	 * @param companyId
 	 */
 	public Computer(long id, String name, Date introduced, Date discontinued, long companyId) {
 		super();
@@ -71,9 +96,13 @@ public class Computer {
 		}
 		this.company = company;
 	}
-
+	
 	/**
 	 * select from software(without id), go find the company from companyId
+	 * @param name
+	 * @param introduced
+	 * @param discontinued
+	 * @param companyId
 	 */
 	public Computer(String name, Date introduced, Date discontinued, long companyId) {
 		super();
