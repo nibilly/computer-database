@@ -1,9 +1,11 @@
 package com.excilys.formation.cdb.persistence;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +15,8 @@ import com.excilys.formation.cdb.model.NoResultException;
 import com.excilys.formation.cdb.model.Page;
 
 /**
- * SQL computer table access manager 
+ * SQL computer table access manager
+ * 
  * @author nbilly
  *
  */
@@ -21,17 +24,18 @@ public class DAOComputer {
 
 	/**
 	 * look for all computers
+	 * 
 	 * @return computers
 	 */
 	public static List<Computer> findAll() {
 		List<Computer> computers;
-		Connection connection = CDBConnection.getConnection();
 		computers = new ArrayList<Computer>();
-		Statement statement;
-		try {
-			statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery("select * from computer;");
-			while(resultSet.next()) {
+		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
+				+ "company.id company_id, company.name company_name from computer join company on computer.company_id = company.id;";
+		try (Connection connection = CDBConnection.getConnection();
+				Statement statement= connection.createStatement();
+				ResultSet resultSet = statement.executeQuery(request)) {
+			while (resultSet.next()) {
 				Computer computer = ComputerMapper.mapSQLToJava(resultSet);
 				computers.add(computer);
 			}
@@ -40,15 +44,18 @@ public class DAOComputer {
 		}
 		return computers;
 	}
-	
+
+	/**
+	 * select count(*) from computer;
+	 * @return number of computers
+	 */
 	public static int getNbComputers() {
-		Connection connection = CDBConnection.getConnection();
-		Statement statement;
 		int nbComputers = 0;
-		try {
-			statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery("select count(*) from computer;");
-			if(resultSet.next()) {
+		String request = "select count(*) from computer;";
+		try (Connection connection = CDBConnection.getConnection();
+				Statement statement = connection.createStatement();
+				ResultSet resultSet = statement.executeQuery(request)){
+			if (resultSet.next()) {
 				nbComputers = resultSet.getInt("count(*)");
 			}
 		} catch (SQLException e) {
@@ -56,25 +63,25 @@ public class DAOComputer {
 		}
 		return nbComputers;
 	}
-	
+
 	/**
 	 * look for computers with pagination
-	 * @param page the page have number of rows jumped and number of rowd returned. Also the list of computers is returned by page.entities.
+	 * @param page the page have number of rows jumped and number of rows returned.
+	 *             Also the list of computers is returned by page.entities.
 	 */
 	public static void findComputersPages(Page<Computer> page) {
-		List<Computer> computers;
-		Connection connection = CDBConnection.getConnection();
-		computers = new ArrayList<Computer>();
-		Statement statement;
-		try {
-			statement = connection.createStatement();
-			StringBuffer stringBuffer = new StringBuffer();
-			stringBuffer.append("select * from computer");
-			stringBuffer.append(" limit ").append(page.getNbRowsJumped()).append(",").append(Page.getNbRowsReturned()).append(";");
-			ResultSet resultSet = statement.executeQuery(stringBuffer.toString());
-			while(resultSet.next()) {
-				Computer computer = ComputerMapper.mapSQLToJava(resultSet);
-				computers.add(computer);
+		List<Computer> computers = new ArrayList<>();
+		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
+				+ "company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id limit ?,?;";
+		try (Connection con = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(request)) {
+			preparedStatement.setInt(1, page.getNbRowsJumped());
+			preparedStatement.setInt(2, Page.getNbRowsReturned());
+			try(ResultSet rs = preparedStatement.executeQuery()){
+				while (rs.next()) {
+					Computer computer = ComputerMapper.mapSQLToJava(rs);
+					computers.add(computer);
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -84,105 +91,91 @@ public class DAOComputer {
 
 	/**
 	 * look for one computer
+	 * 
 	 * @param computerId
 	 * @return a computer
 	 * @throws NoResultException
 	 */
 	public static Computer findById(long computerId) throws NoResultException {
 		Computer computer = null;
-		Connection connection = CDBConnection.getConnection();
-		Statement statement;
-		try {
-			statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery("select * from computer where id = " + computerId + ";");
-			if(resultSet.next()) {
-				computer = ComputerMapper.mapSQLToJava(resultSet);
-			}
-			else {
-				throw new NoResultException();
+		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, " 
+				+ "company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id where computer.id = ?;";
+		try (Connection connection = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)){
+			preparedStatement.setLong(1, computerId);
+			try(ResultSet resultSet = preparedStatement.executeQuery()){
+				if (resultSet.next()) {
+					computer = ComputerMapper.mapSQLToJava(resultSet);
+				} else {
+					throw new NoResultException();
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return computer;
 	}
+
 	public static void createComputer(Computer computer) {
-		Connection connection = CDBConnection.getConnection();
-		Statement statement;
-		try {
-			statement = connection.createStatement();
-			StringBuffer stringBuffer = new StringBuffer();
-			stringBuffer.append("insert into computer(name, introduced, discontinued, company_id) values('").append(computer.getName()).append("', ");
-			if(computer.getIntroduced()==null){
-				stringBuffer.append("null, ");
+		String request = "insert into computer(name, introduced, discontinued, company_id) values(?, ?, ?, ?);";
+		try (Connection connection = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)){
+			preparedStatement.setString(1, computer.getName());
+			if (computer.getIntroduced() == null) {
+				preparedStatement.setNull(2, Types.DATE);
+			} else {
+				preparedStatement.setDate(2, computer.getIntroduced());
 			}
-			else {
-				stringBuffer.append("'").append(computer.getIntroduced()).append("', ");
+			if (computer.getDiscontinued() == null) {
+				preparedStatement.setNull(3, Types.DATE);
+			} else {
+				preparedStatement.setDate(3, computer.getDiscontinued());
 			}
-			if(computer.getDiscontinued()==null){
-				stringBuffer.append("null, ");
+			if (computer.getCompany() == null) {
+				preparedStatement.setNull(4, Types.BIGINT);
+			} else {
+				preparedStatement.setLong(4, computer.getCompany().getId());
 			}
-			else {
-				stringBuffer.append("'").append(computer.getDiscontinued()).append("', ");
-			}
-			if(computer.getCompany() == null) {
-				stringBuffer.append("null");
-			}
-			else{
-				stringBuffer.append(computer.getCompany().getId());
-			}
-			stringBuffer.append(");");
-			statement.executeUpdate(stringBuffer.toString());
+			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void updateComputer(Computer computer) {
-		Connection connection = CDBConnection.getConnection();
-		Statement statement;
-		try {
-			statement = connection.createStatement();
-			StringBuffer stringBuffer = new StringBuffer();
-			stringBuffer.append("update computer set name='").append(computer.getName()).append("', ");
-			stringBuffer.append("introduced=");
-			if(computer.getIntroduced()==null){
-				stringBuffer.append("null, ");
+		String request = "update computer set name=?, introduced=?, discontinued=?, company_id=? where id=?;";
+		try (Connection connection = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)){
+			preparedStatement.setString(1, computer.getName());
+			if (computer.getIntroduced() == null) {
+				preparedStatement.setNull(2, Types.VARCHAR);
+			} else {
+				preparedStatement.setDate(2, computer.getIntroduced());
 			}
-			else {
-				stringBuffer.append("'").append(computer.getIntroduced()).append("', ");
+			if (computer.getDiscontinued() == null) {
+				preparedStatement.setNull(3, Types.VARCHAR);
+			} else {
+				preparedStatement.setDate(3, computer.getDiscontinued());
 			}
-			stringBuffer.append("discontinued=");
-			if(computer.getDiscontinued()==null){
-				stringBuffer.append("null, ");
+			if (computer.getCompany() == null) {
+				preparedStatement.setNull(4, Types.BIGINT);
+			} else {
+				preparedStatement.setLong(4, computer.getCompany().getId());
 			}
-			else {
-				stringBuffer.append("'").append(computer.getDiscontinued()).append("', ");
-			}
-			stringBuffer.append("company_id=");
-			if(computer.getCompany()==null) {
-				stringBuffer.append("null");
-			}
-			else{
-				stringBuffer.append(computer.getCompany().getId());
-			}
-			stringBuffer.append(" where id=").append(computer.getId()).append(";");
-			System.out.println(stringBuffer.toString());
-			statement.executeUpdate(stringBuffer.toString());
+			preparedStatement.setLong(5, computer.getId());
+			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void deleteComputerById(long computerId) {
-		Connection connection = CDBConnection.getConnection();
-		Statement statement;
-		try {
-			statement = connection.createStatement();
-			StringBuffer stringBuffer = new StringBuffer();
-			stringBuffer.append("delete from computer where id=").append(computerId).append(";");
-			statement.executeUpdate(stringBuffer.toString());			
-		} catch(SQLException e) {
+		String request = "delete from computer where id=?;";
+		try (Connection connection = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
+			preparedStatement.setLong(1, computerId);
+			preparedStatement.executeUpdate();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}

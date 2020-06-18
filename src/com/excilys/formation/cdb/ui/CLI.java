@@ -17,9 +17,10 @@ import com.excilys.formation.cdb.service.ComputerService;
  *
  */
 public class CLI {
-	private static boolean continuer;
 	private static Scanner scanner;
 	private static SimpleDateFormat simpleDateFormat;
+	private static boolean continuerMenu;
+	private static boolean continuerPageRequest;
 
 	/**
 	 * Create a scanner, while user continue to respond call menu else close scanner
@@ -29,8 +30,8 @@ public class CLI {
 		simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		simpleDateFormat.setLenient(false);
 		scanner = new Scanner(System.in);
-		continuer = true;
-		while(continuer) {
+		continuerMenu = true;
+		while(continuerMenu) {
 			menu();
 		}
 		scanner.close();
@@ -55,7 +56,7 @@ public class CLI {
 		System.out.println();
 		switch (choice) {
 		case "0":
-			continuer = false;
+			continuerMenu = false;
 			break;
 		case "1":
 			computerListing();
@@ -128,11 +129,11 @@ public class CLI {
 			introducedDate = null;
 			discontinuedDate = null;
 			companyIdLong = 0l;
-			if(name.compareTo("") == 0) {
+			if(name.equals("")) {
 				System.out.println("Name incorrect");
 				continuer = true;
 			}
-			if(introduced.compareTo("null") != 0){
+			if(!introduced.equals("null")){
 				try{
 					introducedDate = new java.sql.Date(simpleDateFormat.parse(introduced).getTime());
 				}
@@ -141,7 +142,7 @@ public class CLI {
 					continuer = true;
 				}
 			}
-			if(discontinued.compareTo("null") != 0) {
+			if(!discontinued.equals("null")) {
 				try{
 					discontinuedDate = new java.sql.Date(simpleDateFormat.parse(discontinued).getTime());
 				}
@@ -150,7 +151,7 @@ public class CLI {
 					continuer = true;
 				}
 			}
-			if(companyId.compareTo("null") != 0) {
+			if(!companyId.equals("null")) {
 				try {
 					companyIdLong = Long.parseLong(companyId);
 				}
@@ -202,7 +203,7 @@ public class CLI {
 			if(computerExist) {
 				System.out.println(computer);
 				System.out.println("Is this computer which you want (O/n)?");			
-				if(scanner.nextLine().compareTo("n")==0) {
+				if(scanner.nextLine().equals("n")) {
 					incorrectComputer = true;
 				}
 			}
@@ -220,7 +221,7 @@ public class CLI {
 		System.out.println("---List computers---");
 		int nbRowsJumped = 0;
 		Page<Computer> actualPage = new Page<Computer>(1, nbRowsJumped);
-		boolean continuer = true;
+		continuerPageRequest = true;
 		// Page display
 		do {
 			ComputerService.findComputersPages(actualPage);
@@ -237,39 +238,51 @@ public class CLI {
 				if((nbComputers%Page.getNbRowsReturned())>0) {
 					nbPages++;
 				}
-				System.out.print("Page " + actualPage.getPageNumber() + "/" +nbPages);
-				System.out.print(". Which page do you want ('n' for next, '0' to stop or a number)?");
-				String page = scanner.nextLine();
-				if(page.compareTo("0")==0) {
-					continuer = false;
-				}
-				else {
-					if(page.compareTo("n")==0) {
-						pageRequested = actualPage.getPageNumber() + 1;
-					}
-					else {
-						try {
-							pageRequested = Integer.parseInt(page);
-							if(pageRequested < 1 || pageRequested > nbPages) {
-								System.out.println("Incorrect page number");
-								pageRequested = 0;
-							}
-						}
-						catch(NumberFormatException e){
-							System.out.println("Incorrect page number");
-						}
-					}
-				}
+				pageRequested = pageRequest(nbPages, actualPage);
 			}
-			while (pageRequested == 0 && continuer);
-			if(continuer) {
+			while (pageRequested == 0 && continuerPageRequest);
+			if(continuerPageRequest) {
 				nbRowsJumped = Page.getNbRowsReturned() * (pageRequested-1);
 				actualPage = new Page<Computer>(pageRequested, nbRowsJumped);
 			}
 			System.out.println();
 		}
-		while(continuer);
+		while(continuerPageRequest);
 		System.out.println("END of listing");
+	}
+	
+	private static int pageRequest(int nbPages, @SuppressWarnings("rawtypes") Page actualPage) {
+		int pageRequested = 0;
+		System.out.print("Page " + actualPage.getPageNumber() + "/" +nbPages);
+		System.out.print(". Which page do you want ('n' for next, '0' to stop or a number)?");
+		String page = scanner.nextLine();
+		if(page.equals("0")) {
+			continuerPageRequest = false;
+		}
+		else {
+			if(page.equals("n")) {
+				if(actualPage.getPageNumber() >= nbPages)
+				{
+					System.out.println("Last page reached");
+				}
+				else {
+					pageRequested = actualPage.getPageNumber() + 1;
+				}
+			}
+			else {
+				try {
+					pageRequested = Integer.parseInt(page);
+					if(pageRequested < 1 || pageRequested > nbPages) {
+						System.out.println("Incorrect page number");
+						pageRequested = 0;
+					}
+				}
+				catch(NumberFormatException e){
+					System.out.println("Incorrect page number");
+				}
+			}
+		}
+		return pageRequested;
 	}
 
 	private static void companyListing() {
@@ -277,7 +290,7 @@ public class CLI {
 		
 		int nbRowsJumped = 0;
 		Page<Company> actualPage = new Page<Company>(1, nbRowsJumped);
-		boolean continuer = true;
+		continuerPageRequest = true;
 		// Page display
 		do {
 			CompanyService.findCompanyPages(actualPage);
@@ -294,38 +307,16 @@ public class CLI {
 				if((nbCompanies%Page.getNbRowsReturned())>0) {
 					nbPages++;
 				}
-				System.out.print("Page " + actualPage.getPageNumber() + "/" +nbPages);
-				System.out.print(". Which page do you want ('n' for next, '0' to stop or a number)?");
-				String page = scanner.nextLine();
-				if(page.compareTo("0")==0) {
-					continuer = false;
-				}
-				else {
-					if(page.compareTo("n")==0) {
-						pageRequested = actualPage.getPageNumber() + 1;
-					}
-					else {
-						try {
-							pageRequested = Integer.parseInt(page);
-							if(pageRequested < 1 || pageRequested > nbPages) {
-								System.out.println("Incorrect page number");
-								pageRequested = 0;
-							}
-						}
-						catch(NumberFormatException e){
-							System.out.println("Incorrect page number");
-						}
-					}
-				}
+				pageRequested = pageRequest(nbPages, actualPage);
 			}
-			while (pageRequested == 0 && continuer);
-			if(continuer) {
+			while (pageRequested == 0 && continuerPageRequest);
+			if(continuerPageRequest) {
 				nbRowsJumped = Page.getNbRowsReturned() * (pageRequested-1);
 				actualPage = new Page<Company>(pageRequested, nbRowsJumped);
 			}
 			System.out.println();
 		}
-		while(continuer);
+		while(continuerPageRequest);
 		System.out.println("END of listing");
 	
 	}

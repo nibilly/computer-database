@@ -1,6 +1,7 @@
 package com.excilys.formation.cdb.persistence;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -18,19 +19,17 @@ import com.excilys.formation.cdb.model.Page;
  *
  */
 public class DAOCompany {
-	
+
 	/**
 	 * Select * from company;
 	 * @return all companies
 	 */
 	public static List<Company> findAll() {
-		List<Company> companies;
-		Connection connection = CDBConnection.getConnection();
-		companies = new ArrayList<Company>();
-		Statement statement;
-		try {
-			statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery("select * from company;");
+		List<Company> companies = new ArrayList<Company>();
+		String query = "Select id, name from company;";
+		try(Connection connection = CDBConnection.getConnection();
+				Statement statement = connection.createStatement();
+				ResultSet resultSet = statement.executeQuery(query)){
 			while(resultSet.next()) {
 				Company company = CompanyMapper.mapSQLToCompany(resultSet);
 				companies.add(company);
@@ -49,16 +48,17 @@ public class DAOCompany {
 	 */
 	public static Company findById(long companyId) throws NoResultException {
 		Company company = null;
-		Connection connection = CDBConnection.getConnection();
-		Statement statement;
-		try {
-			statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery("select * from company where id = " + companyId + ";");
-			if(resultSet.next()) {
-				company = CompanyMapper.mapSQLToCompany(resultSet);
-			}
-			else {
-				throw new NoResultException();
+		String query = "select * from company where id = ?;";
+		try(Connection connection = CDBConnection.getConnection();
+				PreparedStatement preparedStatement= connection.prepareStatement(query)){
+			preparedStatement.setLong(1, companyId);
+			try(ResultSet resultSet = preparedStatement.executeQuery()){
+				if(resultSet.next()) {
+					company = CompanyMapper.mapSQLToCompany(resultSet);
+				}
+				else {
+					throw new NoResultException();
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -68,9 +68,10 @@ public class DAOCompany {
 
 	public static int getNbCompanies() {
 		int nbCompanies = 0;
-		try(Connection connection = CDBConnection.getConnection()){
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery("select count(*) from company;");
+		String query = "select count(*) from company;";
+		try(Connection connection = CDBConnection.getConnection();
+				Statement statement = connection.createStatement();
+				ResultSet resultSet = statement.executeQuery(query)){
 			if(resultSet.next()) {
 				nbCompanies = resultSet.getInt("count(*)");
 			}
@@ -81,16 +82,17 @@ public class DAOCompany {
 	}
 
 	public static void findAllPages(Page<Company> page) {
-		List<Company> companies;
-		Connection connection = CDBConnection.getConnection();
-		companies = new ArrayList<Company>();
-		Statement statement;
-		try {
-			statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery("select * from company limit "+page.getNbRowsJumped()+","+Page.getNbRowsReturned()+";");
-			while(resultSet.next()) {
-				Company company = CompanyMapper.mapSQLToCompany(resultSet);
-				companies.add(company);
+		List<Company> companies = new ArrayList<Company>();
+		String query = "select * from company limit ?,?;";
+		try(Connection connection = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(query)){
+			preparedStatement.setInt(1, page.getNbRowsJumped());
+			preparedStatement.setInt(2, Page.getNbRowsReturned());
+			try(ResultSet resultSet = preparedStatement.executeQuery()){
+				while(resultSet.next()) {
+					Company company = CompanyMapper.mapSQLToCompany(resultSet);
+					companies.add(company);
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

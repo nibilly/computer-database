@@ -20,10 +20,11 @@ public class ComputerMapper {
 	 */
 	public static Computer mapSQLToJava(ResultSet resultSet) throws SQLException {
 		long id = resultSet.getLong("id");
-		String name = resultSet.getString("name");
+		String name = resultSet.getString("computer_name");
 		Date introduced = resultSet.getDate("introduced");
 		Date discontinued = resultSet.getDate("discontinued");
 		long companyId = resultSet.getLong("company_id");
-		return new Computer(id, name, introduced, discontinued, companyId);
+		String companyName = resultSet.getString("company_name");		
+		return new Computer(id, name, introduced, discontinued, companyId, companyName);
 	}
 }

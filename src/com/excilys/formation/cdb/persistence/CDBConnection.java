@@ -9,10 +9,10 @@ import java.sql.SQLException;
  * @author nbilly
  *
  */
-public class CDBConnection {
+public class CDBConnection{
 
 	/**
-	 * JDBC connection
+	 * JDBC connection which is Autocloseable
 	 */
 	private static Connection connection;
 
@@ -36,24 +36,5 @@ public class CDBConnection {
 			e.printStackTrace();
 		}
 		return connection;
-	}
-
-	/**
-	 * Close connection
-	 */
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		if(connection != null) {
-			try {
-				Class.forName("com.mysql.cj.jdbc.Driver");
-				connection.close();
-				connection = null;
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 }

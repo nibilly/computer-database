@@ -75,30 +75,24 @@ public class Computer {
 	}
 
 	/**
-	 * select from BD, go find the company from companyId
+	 * select from BD
 	 * @param id
 	 * @param name
 	 * @param introduced
 	 * @param discontinued
 	 * @param companyId
 	 */
-	public Computer(long id, String name, Date introduced, Date discontinued, long companyId) {
+	public Computer(long id, String name, Date introduced, Date discontinued, long companyId, String companyName) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
 		this.discontinued = discontinued;
-		Company company;
-		try {
-			company = DAOCompany.findById(companyId);
-		} catch (NoResultException e) {
-			company = null;
-		}
-		this.company = company;
+		this.company = new Company(companyId, companyName);
 	}
 	
 	/**
-	 * select from software(without id), go find the company from companyId
+	 * select from software(without id), go find the company in BD from companyId
 	 * @param name
 	 * @param introduced
 	 * @param discontinued
@@ -122,8 +116,8 @@ public class Computer {
 
 	@Override
 	public String toString() {
-		return "Computer [id=" + id + ", name=" + name + ", introduced=" + introduced + ", discontinued=" + discontinued
-				+ ", company=" + company + "]";
+		return "Computer [id=" + this.id + ", name=" + this.name + ", introduced=" + this.introduced + ", discontinued=" + this.discontinued
+				+ ", company=" + this.company + "]";
 	}
 
 }

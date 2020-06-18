@@ -26,7 +26,7 @@ public class Page<T> {
 	private int nbRowsJumped;
 
 	public int getPageNumber() {
-		return pageNumber;
+		return this.pageNumber;
 	}
 
 	public void setPageNumber(int pageNumber) {
@@ -34,7 +34,7 @@ public class Page<T> {
 	}
 
 	public List<T> getEntities() {
-		return entities;
+		return this.entities;
 	}
 
 	public void setEntities(List<T> entities) {
@@ -56,7 +56,6 @@ public class Page<T> {
 	}
 
 	public Page() {
-
 	}
 
 	public Page(int pageNumber, int nbRowsJumped) {
