@@ -1,6 +1,6 @@
 package com.excilys.formation.cdb.model;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 import com.excilys.formation.cdb.persistence.DAOCompany;
 
@@ -21,11 +21,11 @@ public class Computer {
 	/**
 	 * when this computer can be buy in market
 	 */
-	private Date introduced;
+	private LocalDate introduced;
 	/**
 	 * when this computer cannot be buy in market
 	 */
-	private Date discontinued;
+	private LocalDate discontinued;
 	/**
 	 * a computer is produced by a company
 	 */
@@ -47,19 +47,19 @@ public class Computer {
 		this.name = name;
 	}
 
-	public Date getIntroduced() {
+	public LocalDate getIntroduced() {
 		return introduced;
 	}
 
-	public void setIntroduced(Date introduced) {
+	public void setIntroduced(LocalDate introduced) {
 		this.introduced = introduced;
 	}
 
-	public Date getDiscontinued() {
+	public LocalDate getDiscontinued() {
 		return discontinued;
 	}
 
-	public void setDiscontinued(Date discontinued) {
+	public void setDiscontinued(LocalDate discontinued) {
 		this.discontinued = discontinued;
 	}
 
@@ -82,7 +82,7 @@ public class Computer {
 	 * @param discontinued
 	 * @param companyId
 	 */
-	public Computer(long id, String name, Date introduced, Date discontinued, long companyId, String companyName) {
+	public Computer(long id, String name, LocalDate introduced, LocalDate discontinued, long companyId, String companyName) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -98,7 +98,7 @@ public class Computer {
 	 * @param discontinued
 	 * @param companyId
 	 */
-	public Computer(String name, Date introduced, Date discontinued, long companyId) {
+	public Computer(String name, LocalDate introduced, LocalDate discontinued, long companyId) {
 		super();
 		this.name = name;
 		this.introduced = introduced;

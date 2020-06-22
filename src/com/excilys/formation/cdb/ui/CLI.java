@@ -1,7 +1,8 @@
 package com.excilys.formation.cdb.ui;
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 import com.excilys.formation.cdb.model.Company;
@@ -18,7 +19,7 @@ import com.excilys.formation.cdb.service.ComputerService;
  */
 public class CLI {
 	private static Scanner scanner;
-	private static SimpleDateFormat simpleDateFormat;
+	private static DateTimeFormatter dateTimeFormatter;
 	private static boolean continuerMenu;
 	private static boolean continuerPageRequest;
 
@@ -27,8 +28,7 @@ public class CLI {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		simpleDateFormat.setLenient(false);
+		dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		scanner = new Scanner(System.in);
 		continuerMenu = true;
 		while(continuerMenu) {
@@ -111,9 +111,9 @@ public class CLI {
 		boolean continuer;
 		String name = null;
 		String introduced = null;
-		Date introducedDate = null;
+		LocalDate introducedDate = null;
 		String discontinued = null;
-		Date discontinuedDate = null;
+		LocalDate discontinuedDate = null;
 		String companyId = null;
 		long companyIdLong = 0l;
 		do {
@@ -135,18 +135,18 @@ public class CLI {
 			}
 			if(!introduced.equals("null")){
 				try{
-					introducedDate = new java.sql.Date(simpleDateFormat.parse(introduced).getTime());
+					introducedDate = LocalDate.parse(introduced, dateTimeFormatter);
 				}
-				catch(ParseException e){
+				catch(DateTimeParseException e){
 					System.out.println("Introduced date incorrect");
 					continuer = true;
 				}
 			}
 			if(!discontinued.equals("null")) {
 				try{
-					discontinuedDate = new java.sql.Date(simpleDateFormat.parse(discontinued).getTime());
+					discontinuedDate = LocalDate.parse(discontinued, dateTimeFormatter);
 				}
-				catch (ParseException e) {
+				catch (DateTimeParseException e) {
 					System.out.println("Discontinued date incorrect");
 					continuer = true;
 				}

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.excilys.formation.cdb.mapper.ComputerMapper;
+import com.excilys.formation.cdb.mapper.DateMapper;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.NoResultException;
 import com.excilys.formation.cdb.model.Page;
@@ -124,12 +125,12 @@ public class DAOComputer {
 			if (computer.getIntroduced() == null) {
 				preparedStatement.setNull(2, Types.DATE);
 			} else {
-				preparedStatement.setDate(2, computer.getIntroduced());
+				preparedStatement.setDate(2, DateMapper.localDateToSqlDate(computer.getIntroduced()));
 			}
 			if (computer.getDiscontinued() == null) {
 				preparedStatement.setNull(3, Types.DATE);
 			} else {
-				preparedStatement.setDate(3, computer.getDiscontinued());
+				preparedStatement.setDate(3, DateMapper.localDateToSqlDate(computer.getDiscontinued()));
 			}
 			if (computer.getCompany() == null) {
 				preparedStatement.setNull(4, Types.BIGINT);
@@ -150,12 +151,12 @@ public class DAOComputer {
 			if (computer.getIntroduced() == null) {
 				preparedStatement.setNull(2, Types.VARCHAR);
 			} else {
-				preparedStatement.setDate(2, computer.getIntroduced());
+				preparedStatement.setDate(2, DateMapper.localDateToSqlDate(computer.getIntroduced()));
 			}
 			if (computer.getDiscontinued() == null) {
 				preparedStatement.setNull(3, Types.VARCHAR);
 			} else {
-				preparedStatement.setDate(3, computer.getDiscontinued());
+				preparedStatement.setDate(3, DateMapper.localDateToSqlDate(computer.getDiscontinued()));
 			}
 			if (computer.getCompany() == null) {
 				preparedStatement.setNull(4, Types.BIGINT);
