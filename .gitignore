@@ -1,5 +1,6 @@
 WebContent/
 bin/
+target/
 .settings/
 .classpath
 .project

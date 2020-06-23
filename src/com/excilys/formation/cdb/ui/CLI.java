@@ -2,7 +2,6 @@ package com.excilys.formation.cdb.ui;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.text.ParseException;
 import java.util.Scanner;
 
 import com.excilys.formation.cdb.model.Company;
