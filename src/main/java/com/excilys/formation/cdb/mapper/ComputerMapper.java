@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.excilys.formation.cdb.dto.ComputerDTO;
+import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
 
 /**
@@ -26,5 +28,10 @@ public class ComputerMapper {
 		long companyId = resultSet.getLong("company_id");
 		String companyName = resultSet.getString("company_name");		
 		return new Computer(id, name, introduced, discontinued, companyId, companyName);
+	}
+	
+	public static ComputerDTO mapComputerDTO(Computer computer) {
+		return new ComputerDTO(computer.getId()+"", computer.getName(), computer.getIntroduced().toString(), computer.getDiscontinued().toString(), 
+				computer.getCompany().getId()+"", computer.getCompany().getName());
 	}
 }

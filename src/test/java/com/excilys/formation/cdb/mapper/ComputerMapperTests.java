@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.excilys.formation.cdb.dto.ComputerDTO;
 import com.excilys.formation.cdb.model.Computer;
 
 class ComputerMapperTests {
@@ -43,5 +44,23 @@ class ComputerMapperTests {
 			e.printStackTrace();
 		}
 		assertEquals(computerTest, computer);
+	}
+	
+	@Test
+	void mapComputerDTO() {
+		long id = 1L;
+		String name = "name";
+		LocalDate introduced = LocalDate.parse("1995-01-01", dateTimeFormatter);
+		LocalDate discontinued = LocalDate.parse("1995-01-01", dateTimeFormatter);
+		long companyId = 2L;
+		String companyName = "companyName";
+		Computer computer = new Computer(id, name, introduced, discontinued, companyId, companyName);
+		ComputerDTO computerDTO = ComputerMapper.mapComputerDTO(computer);
+		assertEquals(id+"", computerDTO.getId());
+		assertEquals(name, computerDTO.getName());
+		assertEquals(introduced.toString(), computerDTO.getIntroduced());
+		assertEquals(discontinued.toString(), computerDTO.getDiscontinued());
+		assertEquals(companyId+"", computerDTO.getCompanyId());
+		assertEquals(companyName, computerDTO.getCompanyName());
 	}
 }

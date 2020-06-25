@@ -3,6 +3,7 @@ package com.excilys.formation.cdb.mapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.excilys.formation.cdb.dto.CompanyDTO;
 import com.excilys.formation.cdb.model.Company;
 /**
  * Map company from different types
@@ -20,5 +21,9 @@ public class CompanyMapper {
 		long id = resultSet.getLong("id");
 		String name = resultSet.getString("name");
 		return new Company(id, name);
+	}
+	
+	public static CompanyDTO mapCompanyDTO(Company company) {
+		return new CompanyDTO(company.getId()+"", company.getName());
 	}
 }

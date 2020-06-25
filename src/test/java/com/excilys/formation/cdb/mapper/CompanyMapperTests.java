@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.excilys.formation.cdb.dto.CompanyDTO;
 import com.excilys.formation.cdb.model.Company;
 
 class CompanyMapperTests {
@@ -36,6 +37,16 @@ class CompanyMapperTests {
 			e.printStackTrace();
 		}
 		assertEquals(companyTest, company);
+	}
+	
+	@Test
+	void mapCompanyDTO() {
+		long id = 1L;
+		String name = "name";
+		Company company = new Company(id, name);
+		CompanyDTO companyDTO = CompanyMapper.mapCompanyDTO(company);
+		assertEquals(id+"", companyDTO.getId());
+		assertEquals(name, companyDTO.getName());
 	}
 
 }
