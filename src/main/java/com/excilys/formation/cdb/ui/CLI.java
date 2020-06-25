@@ -4,6 +4,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.NoResultException;
@@ -17,6 +20,7 @@ import com.excilys.formation.cdb.service.ComputerService;
  *
  */
 public class CLI {
+	private static Logger logger = LoggerFactory.getLogger(CLI.class);
 	private static Scanner scanner;
 	private static DateTimeFormatter dateTimeFormatter;
 	private static boolean continuerMenu;
@@ -27,6 +31,7 @@ public class CLI {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		logger.info("Début CLI");
 		dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		scanner = new Scanner(System.in);
 		continuerMenu = true;
@@ -34,6 +39,7 @@ public class CLI {
 			menu();
 		}
 		scanner.close();
+		logger.info("Fin CLI");
 	}
 
 	/**

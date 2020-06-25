@@ -18,11 +18,11 @@ public class ComputerMapper {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Computer mapSQLToJava(ResultSet resultSet) throws SQLException {
+	public static Computer mapSQLToComputer(ResultSet resultSet) throws SQLException {
 		long id = resultSet.getLong("id");
 		String name = resultSet.getString("computer_name");
-		LocalDate introduced = DateMapper.sqlDateToLocalDate(resultSet.getDate("introduced"));
-		LocalDate discontinued = DateMapper.sqlDateToLocalDate(resultSet.getDate("discontinued"));
+		LocalDate introduced = DateMapper.localDateFromSqlDate(resultSet.getDate("introduced"));
+		LocalDate discontinued = DateMapper.localDateFromSqlDate(resultSet.getDate("discontinued"));
 		long companyId = resultSet.getLong("company_id");
 		String companyName = resultSet.getString("company_name");		
 		return new Computer(id, name, introduced, discontinued, companyId, companyName);

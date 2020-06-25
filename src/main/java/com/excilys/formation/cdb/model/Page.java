@@ -3,7 +3,7 @@ package com.excilys.formation.cdb.model;
 import java.util.List;
 
 /**
- * a computer page for pagination
+ * a computer or company page for pagination
  * @author nbilly
  *
  */
@@ -59,7 +59,6 @@ public class Page<T> {
 	}
 
 	public Page(int pageNumber, int nbRowsJumped) {
-		super();
 		this.pageNumber = pageNumber;
 		this.nbRowsJumped = nbRowsJumped;
 	}

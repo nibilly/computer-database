@@ -37,7 +37,7 @@ public class DAOComputer {
 				Statement statement= connection.createStatement();
 				ResultSet resultSet = statement.executeQuery(request)) {
 			while (resultSet.next()) {
-				Computer computer = ComputerMapper.mapSQLToJava(resultSet);
+				Computer computer = ComputerMapper.mapSQLToComputer(resultSet);
 				computers.add(computer);
 			}
 		} catch (SQLException e) {
@@ -80,7 +80,7 @@ public class DAOComputer {
 			preparedStatement.setInt(2, Page.getNbRowsReturned());
 			try(ResultSet rs = preparedStatement.executeQuery()){
 				while (rs.next()) {
-					Computer computer = ComputerMapper.mapSQLToJava(rs);
+					Computer computer = ComputerMapper.mapSQLToComputer(rs);
 					computers.add(computer);
 				}
 			}
@@ -106,7 +106,7 @@ public class DAOComputer {
 			preparedStatement.setLong(1, computerId);
 			try(ResultSet resultSet = preparedStatement.executeQuery()){
 				if (resultSet.next()) {
-					computer = ComputerMapper.mapSQLToJava(resultSet);
+					computer = ComputerMapper.mapSQLToComputer(resultSet);
 				} else {
 					throw new NoResultException();
 				}
@@ -125,12 +125,12 @@ public class DAOComputer {
 			if (computer.getIntroduced() == null) {
 				preparedStatement.setNull(2, Types.DATE);
 			} else {
-				preparedStatement.setDate(2, DateMapper.localDateToSqlDate(computer.getIntroduced()));
+				preparedStatement.setDate(2, DateMapper.sqlDateFromLocalDate(computer.getIntroduced()));
 			}
 			if (computer.getDiscontinued() == null) {
 				preparedStatement.setNull(3, Types.DATE);
 			} else {
-				preparedStatement.setDate(3, DateMapper.localDateToSqlDate(computer.getDiscontinued()));
+				preparedStatement.setDate(3, DateMapper.sqlDateFromLocalDate(computer.getDiscontinued()));
 			}
 			if (computer.getCompany() == null) {
 				preparedStatement.setNull(4, Types.BIGINT);
@@ -151,12 +151,12 @@ public class DAOComputer {
 			if (computer.getIntroduced() == null) {
 				preparedStatement.setNull(2, Types.VARCHAR);
 			} else {
-				preparedStatement.setDate(2, DateMapper.localDateToSqlDate(computer.getIntroduced()));
+				preparedStatement.setDate(2, DateMapper.sqlDateFromLocalDate(computer.getIntroduced()));
 			}
 			if (computer.getDiscontinued() == null) {
 				preparedStatement.setNull(3, Types.VARCHAR);
 			} else {
-				preparedStatement.setDate(3, DateMapper.localDateToSqlDate(computer.getDiscontinued()));
+				preparedStatement.setDate(3, DateMapper.sqlDateFromLocalDate(computer.getDiscontinued()));
 			}
 			if (computer.getCompany() == null) {
 				preparedStatement.setNull(4, Types.BIGINT);
