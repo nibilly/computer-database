@@ -1,11 +1,10 @@
 package com.excilys.formation.cdb.mapper;
 
-import java.time.LocalDate;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.SQLException;	
+import java.time.LocalDate;
 
 import com.excilys.formation.cdb.dto.ComputerDTO;
-import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
 
 /**
@@ -31,7 +30,29 @@ public class ComputerMapper {
 	}
 	
 	public static ComputerDTO mapComputerDTO(Computer computer) {
-		return new ComputerDTO(computer.getId()+"", computer.getName(), computer.getIntroduced().toString(), computer.getDiscontinued().toString(), 
-				computer.getCompany().getId()+"", computer.getCompany().getName());
+		 ComputerDTO computerDTO = new ComputerDTO();
+		 computerDTO.setId(computer.getId()+"");
+		 computerDTO.setName(computer.getName());
+		 if(computer.getIntroduced()!= null) {
+			 computerDTO.setIntroduced(computer.getIntroduced().toString());
+		 }
+		 else {
+			 computerDTO.setIntroduced("");
+		 }
+		 if(computer.getDiscontinued()!=null) {
+			 computerDTO.setDiscontinued(computer.getDiscontinued().toString());
+		 }
+		 else {
+			 computerDTO.setDiscontinued("");
+		 }
+		 if(computer.getCompany() != null) {
+			 computerDTO.setCompanyId(computer.getCompany().getId()+"");
+			 computerDTO.setCompanyName(computer.getCompany().getName());
+		 }
+		 else{
+			 computerDTO.setCompanyId("");
+			 computerDTO.setCompanyName(computer.getCompany().getName());
+		 }
+		 return computerDTO;
 	}
 }
