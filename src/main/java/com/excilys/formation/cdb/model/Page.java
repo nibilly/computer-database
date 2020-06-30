@@ -11,7 +11,7 @@ public class Page<T> {
 	/**
 	 * number of rows per list
 	 */
-	private static final int NB_ROWS_RETURNED = 10;
+	private static int nbRowsReturned = 10;
 	/**
 	 * this page number
 	 */
@@ -52,7 +52,11 @@ public class Page<T> {
 	}
 
 	public static int getNbRowsReturned() {
-		return NB_ROWS_RETURNED;
+		return nbRowsReturned;
+	}
+
+	public static void setNbRowsReturned(int nbRowsReturned) {
+		Page.nbRowsReturned = nbRowsReturned;
 	}
 
 	public Page() {

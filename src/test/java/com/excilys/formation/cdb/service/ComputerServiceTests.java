@@ -14,9 +14,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
-import com.excilys.formation.cdb.model.NoResultException;
 import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.persistence.CDBConnection;
 

@@ -2,6 +2,7 @@ package com.excilys.formation.cdb.model;
 
 import java.time.LocalDate;
 
+import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.persistence.DAOCompany;
 
 /**

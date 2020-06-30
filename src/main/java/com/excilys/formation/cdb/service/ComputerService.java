@@ -5,8 +5,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.model.Computer;
-import com.excilys.formation.cdb.model.NoResultException;
 import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.persistence.DAOComputer;
 
@@ -17,7 +17,7 @@ import com.excilys.formation.cdb.persistence.DAOComputer;
  */
 public class ComputerService {
 
-	private static Logger logger = LoggerFactory.getLogger(CompanyService.class);
+	private static Logger logger = LoggerFactory.getLogger(ComputerService.class);
 	
 	public static void deleteComputerById(long computerId) {
 		logger.info("deleteComputerById");

@@ -3,6 +3,9 @@ package com.excilys.formation.cdb.mapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;	
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
+import org.apache.el.parser.ParseException;
 
 import com.excilys.formation.cdb.dto.ComputerDTO;
 import com.excilys.formation.cdb.model.Computer;
@@ -54,5 +57,16 @@ public class ComputerMapper {
 			 computerDTO.setCompanyName(computer.getCompany().getName());
 		 }
 		 return computerDTO;
+	}
+
+	public static Computer mapComputer(ComputerDTO computerDTO) {
+		Computer computer = null;
+		
+		String name = computerDTO.getName();
+		LocalDate introduced = DateMapper.localDateFromString(computerDTO.getIntroduced());
+		LocalDate discontinued = DateMapper.localDateFromString(computerDTO.getDiscontinued());
+		long companyId = Long.parseLong(computerDTO.getCompanyId());
+		computer = new Computer(name, introduced, discontinued, companyId);
+		return computer;
 	}
 }

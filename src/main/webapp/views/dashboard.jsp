@@ -15,14 +15,17 @@
 <body>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="dashboard.html"> Application -
+			<a class="navbar-brand" href="dashboard"> Application -
 				Computer Database </a>
 		</div>
 	</header>
 
 	<section id="main">
 		<div class="container">
-			<h1 id="homeTitle">${nbComputers}Computers found</h1>
+			<h1 id="homeTitle">
+				<c:out value="${nbComputers}" />
+				Computers found
+			</h1>
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
 					<form id="searchForm" action="#" method="GET" class="form-inline">
@@ -34,7 +37,7 @@
 					</form>
 				</div>
 				<div class="pull-right">
-					<a class="btn btn-success" id="addComputer" href="addComputer.html">Add
+					<a class="btn btn-success" id="addComputer" href="add-computer">Add
 						Computer</a> <a class="btn btn-default" id="editComputer" href="#"
 						onclick="$.fn.toggleEditMode();">Edit</a>
 				</div>
@@ -70,55 +73,93 @@
 				</thead>
 				<!-- Browse attribute computers -->
 				<tbody id="results">
-					<c:forEach var="computer" items="${computers}">
+					<c:forEach var="computer" items="${page.entities}">
 						<tr>
 							<td class="editMode"><input type="checkbox" name="cb"
 								class="cb" value="0"></td>
-							<td><a href="editComputer.html" onclick="">${computer.name}</a></td>
-							<td>${computer.introduced}</td>
-							<td>${computer.discontinued}</td>
-							<td>${computer.companyName}</td>
+							<td><a href="editComputer.html" onclick=""><c:out
+										value="${computer.name}" /></a></td>
+							<td><c:out value="${computer.introduced}" /></td>
+							<td><c:out value="${computer.discontinued}" /></td>
+							<td><c:out value="${computer.companyName}" /></td>
 						</tr>
-						<!--  <tr>
-						<td class="editMode"><input type="checkbox" name="cb"
-							class="cb" value="0"></td>
-						<td><a href="editComputer.html" onclick="">MacBook Pro</a></td>
-						<td>2006-01-10</td>
-						<td></td>
-						<td>Apple Inc.</td>
-
-					</tr> -->
 					</c:forEach>
 				</tbody>
 			</table>
 		</div>
 	</section>
-
 	<footer class="navbar-fixed-bottom">
 		<div class="container text-center">
 			<ul class="pagination">
-				<li><a href="#" aria-label="Previous"> <span
-						aria-hidden="true">&laquo;</span>
-				</a></li>
-				<li><a href="#">1</a></li>
-				<li><a href="#">2</a></li>
-				<li><a href="#">3</a></li>
-				<li><a href="#">4</a></li>
-				<li><a href="#">5</a></li>
-				<li><a href="#" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
-				</a></li>
+				<c:if test="${page.pageNumber gt 1}">
+					<li><a href="dashboard?page=${page.pageNumber - 1}"
+						aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+					</a></li>
+				</c:if>
+				<c:set var="pageIterator" value="${page.pageNumber - 2}" />
+				<c:if test="${pageIterator lt 2}">
+					<c:set var="pageIterator" value="1" />
+				</c:if>
+				<c:if test="${pageIterator gt (nbPages - 4)}">
+					<c:set var="pageIterator" value="${ nbPages - 4}" />
+				</c:if>
+				<c:forEach var="i" begin="0" end="4">
+					<c:choose>
+						<c:when test="${(pageIterator + i) eq page.pageNumber }">
+							<li class="active"><a
+								href="dashboard?page=${pageIterator+i}"><c:out
+										value="${pageIterator+i}"></c:out></a></li>
+						</c:when>
+						<c:otherwise>
+							<li><a href="dashboard?page=${pageIterator+i}"><c:out
+										value="${pageIterator+i}"></c:out></a></li>
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+
+				<c:if test="${page.pageNumber lt nbPages}">
+					<li><a href="dashboard?page=${page.pageNumber + 1}"
+						aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+					</a></li>
+				</c:if>
 			</ul>
 
 			<div class="btn-group btn-group-sm pull-right" role="group">
-				<button type="button" class="btn btn-default">10</button>
-				<button type="button" class="btn btn-default">50</button>
-				<button type="button" class="btn btn-default">100</button>
+				<c:choose>
+					<c:when test="${page.getNbRowsReturned() eq 10}">
+						<button type="button" class="btn btn-default active"
+							onClick="window.location.href='dashboard?nbRowsReturned=10'">10</button>
+					</c:when>
+					<c:otherwise>
+						<button type="button" class="btn btn-default"
+							onClick="window.location.href='dashboard?nbRowsReturned=10'">10</button>
+					</c:otherwise>
+				</c:choose>
+				<c:choose>
+					<c:when test="${page.getNbRowsReturned() eq 50}">
+						<button type="button" class="btn btn-default active"
+							onClick="window.location.href='dashboard?nbRowsReturned=50'">50</button>
+					</c:when>
+					<c:otherwise>
+						<button type="button" class="btn btn-default"
+							onClick="window.location.href='dashboard?nbRowsReturned=50'">50</button>
+					</c:otherwise>
+				</c:choose><c:choose>
+					<c:when test="${page.getNbRowsReturned() eq 100}">
+						<button type="button" class="btn btn-default active"
+							onClick="window.location.href='dashboard?nbRowsReturned=100'">100</button>
+					</c:when>
+					<c:otherwise>
+						<button type="button" class="btn btn-default"
+							onClick="window.location.href='dashboard?nbRowsReturned=100'">100</button>
+					</c:otherwise>
+				</c:choose>
 			</div>
 		</div>
 	</footer>
-	<script src="../js/jquery.min.js"></script>
-	<script src="../js/bootstrap.min.js"></script>
-	<script src="../js/dashboard.js"></script>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/dashboard.js"></script>
 
 </body>
 </html>
