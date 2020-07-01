@@ -25,6 +25,7 @@ public class ComputerListServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html");
 		response.setCharacterEncoding("UTF-8");
+
 		int nbComputers = ComputerService.getNbComputers();
 		request.setAttribute("nbComputers", nbComputers+"");
 

@@ -24,7 +24,7 @@
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
 					<h1>Add Computer</h1>
-					<form action="add-computer" method="POST" id="add-computer-form">
+					<form action="add-computer" method="POST" id="computer-form">
 						<fieldset>
 							<div class="form-group">
 								<label for="computerName">Computer name</label> <input
@@ -42,8 +42,8 @@
 									id="discontinued" placeholder="yyyy-MM-dd">
 							</div>
 							<div class="form-group">
-								<label for="companyId">Company</label> <select name="company"
-									class="form-control" id="companyId">
+								<label for="companyId">Company</label> 
+								<select name="company" class="form-control" id="companyId">
 									<option value="0">--</option>
 									<c:forEach items="${companies}" var="company">
 										<option value="${company.id}">${company.name}</option>
@@ -62,6 +62,7 @@
 		</div>
 	</section>
 	<script src="js/jquery.min.js"></script>
-	<script src="js/addComputer.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+	<script src="js/computerValidation.js"></script>
 </body>
 </html>

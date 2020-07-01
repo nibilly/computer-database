@@ -22,6 +22,8 @@ import com.excilys.formation.cdb.model.Page;
  *
  */
 public class DAOComputer {
+	
+	public static final String COMPUTER_FIND_BY_NAME = "select * from computer left join company on computer.company_id = company.id where computer.name like '%?%';";
 
 	/**
 	 * look for all computers
@@ -47,17 +49,17 @@ public class DAOComputer {
 	}
 
 	/**
-	 * select count(*) from computer;
+	 * select count(id) from computer;
 	 * @return number of computers
 	 */
 	public static int getNbComputers() {
 		int nbComputers = 0;
-		String request = "select count(*) from computer;";
+		String request = "select count(id) from computer;";
 		try (Connection connection = CDBConnection.getConnection();
 				Statement statement = connection.createStatement();
 				ResultSet resultSet = statement.executeQuery(request)){
 			if (resultSet.next()) {
-				nbComputers = resultSet.getInt("count(*)");
+				nbComputers = resultSet.getInt("count(id)");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

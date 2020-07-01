@@ -68,12 +68,12 @@ public class DAOCompany {
 
 	public static int getNbCompanies() {
 		int nbCompanies = 0;
-		String query = "select count(*) from company;";
+		String query = "select count(id) from company;";
 		try(Connection connection = CDBConnection.getConnection();
 				Statement statement = connection.createStatement();
 				ResultSet resultSet = statement.executeQuery(query)){
 			if(resultSet.next()) {
-				nbCompanies = resultSet.getInt("count(*)");
+				nbCompanies = resultSet.getInt("count(id)");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
