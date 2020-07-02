@@ -53,4 +53,9 @@ public class ComputerService {
 		logger.info("getNbComputers");
 		return DAOComputer.getNbComputers();
 	}
+
+	public static void findComputersPageSearch(Page<Computer> page, String search) {
+		logger.info("findComputersPagesSearch");
+		DAOComputer.findComputersPagesSearch(page, search);		
+	}
 }

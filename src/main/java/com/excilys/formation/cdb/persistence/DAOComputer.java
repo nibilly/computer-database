@@ -22,8 +22,6 @@ import com.excilys.formation.cdb.model.Page;
  *
  */
 public class DAOComputer {
-	
-	public static final String COMPUTER_FIND_BY_NAME = "select * from computer left join company on computer.company_id = company.id where computer.name like '%?%';";
 
 	/**
 	 * look for all computers
@@ -90,6 +88,7 @@ public class DAOComputer {
 			e.printStackTrace();
 		}
 		page.setEntities(computers);
+		page.setNbComputerFound(getNbComputers());
 	}
 
 	/**
@@ -178,6 +177,45 @@ public class DAOComputer {
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setLong(1, computerId);
 			preparedStatement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void findComputersPagesSearch(Page<Computer> page, String search) {
+		List<Computer> computers = new ArrayList<>();
+		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
+				+ "company.id company_id, company.name company_name"
+				+ " from computer left join company on computer.company_id = company.id "
+				+ "where computer.name like ? or company.name like ? limit ?,?;";
+		try (Connection con = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(request)) {
+			preparedStatement.setString(1, '%'+search+'%');
+			preparedStatement.setString(2, '%'+search+'%');
+			preparedStatement.setInt(3, page.getNbRowsJumped());
+			preparedStatement.setInt(4, Page.getNbRowsReturned());
+			try(ResultSet rs = preparedStatement.executeQuery()){
+				while (rs.next()) {
+					Computer computer = ComputerMapper.mapSQLToComputer(rs);
+					computers.add(computer);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		page.setEntities(computers);
+		String request2 = "select count(computer.id)"
+				+ " from computer left join company on computer.company_id = company.id "
+				+ "where computer.name like ? or company.name like ?;";
+		try (Connection con = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = con.prepareStatement(request2)) {
+			preparedStatement.setString(1, '%'+search+'%');
+			preparedStatement.setString(2, '%'+search+'%');
+			try(ResultSet rs = preparedStatement.executeQuery()){
+				if (rs.next()) {
+					page.setNbComputerFound(rs.getInt("count(computer.id)"));
+				}
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

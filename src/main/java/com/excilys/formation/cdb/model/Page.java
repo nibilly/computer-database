@@ -24,6 +24,8 @@ public class Page<T> {
 	 * number of rows jumped (offset)
 	 */
 	private int nbRowsJumped;
+	
+	private int nbComputerFound;
 
 	public int getPageNumber() {
 		return this.pageNumber;
@@ -40,9 +42,7 @@ public class Page<T> {
 	public void setEntities(List<T> entities) {
 		this.entities = entities;
 	}
-	
-	
-
+		
 	public int getNbRowsJumped() {
 		return nbRowsJumped;
 	}
@@ -59,6 +59,14 @@ public class Page<T> {
 		Page.nbRowsReturned = nbRowsReturned;
 	}
 
+	public int getNbComputerFound() {
+		return nbComputerFound;
+	}
+
+	public void setNbComputerFound(int nbComputerFound) {
+		this.nbComputerFound = nbComputerFound;
+	}
+
 	public Page() {
 	}
 
@@ -66,7 +74,4 @@ public class Page<T> {
 		this.pageNumber = pageNumber;
 		this.nbRowsJumped = nbRowsJumped;
 	}
-
-	
-
 }
