@@ -3,6 +3,8 @@ package com.excilys.formation.cdb.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.excilys.formation.cdb.dto.ComputerDTO;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
+import com.excilys.formation.cdb.model.OrderBy;
 import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.service.ComputerService;
 
@@ -34,14 +37,32 @@ public class DashboardServlet extends HttpServlet {
 		}
 		Page<ComputerDTO> page = new Page<ComputerDTO>(1, 0);
 		String search = request.getParameter("search");
-		if(search!=null && !search.equals("")) {
-			search(request, response, page, search);
+		request.setAttribute("search", search);
+		String orderByString = request.getParameter("orderBy");
+		request.setAttribute("orderBy", orderByString);
+		OrderBy orderBy = null;
+		if(orderByString!= null) {
+			switch (orderByString) {
+			case "computer":
+				orderBy = OrderBy.COMPUTER_NAME;
+				break;
+			case "introduced":
+				orderBy = OrderBy.INTRODUCED;
+				break;
+			case "discontinued":
+				orderBy = OrderBy.DISCONTINUED;
+				break;
+			case "company":
+				orderBy = OrderBy.COMPANY_NAME;
+				break;
+			default:
+				orderBy = null;
+				break;
+			}
 		}
-		else {
-			listComputers(request, response, page);
-		}
-		request.setAttribute("page", page);
 
+		listComputers(request, response, page, search, orderBy);
+		request.setAttribute("page", page);
 		int nbComputers = page.getNbComputerFound();
 		request.setAttribute("nbComputers", nbComputers+"");		
 		int nbPages = (nbComputers==0)?1:nbComputers/Page.getNbRowsReturned();
@@ -49,11 +70,11 @@ public class DashboardServlet extends HttpServlet {
 			nbPages++;
 		}
 		request.setAttribute("nbPages", nbPages);
-		
+
 		this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
 	}
 
-	private void listComputers(HttpServletRequest request, HttpServletResponse response, Page<ComputerDTO> pageDTO) {
+	private void listComputers(HttpServletRequest request, HttpServletResponse response, Page<ComputerDTO> pageDTO, String search, OrderBy orderBy) {
 		int pageRequested;
 		try {
 			pageRequested = Integer.parseInt(request.getParameter("page"));
@@ -63,7 +84,7 @@ public class DashboardServlet extends HttpServlet {
 		}
 		int nbRowsJumped = Page.getNbRowsReturned() * (pageRequested-1);
 		Page<Computer> page = new Page<Computer>(pageRequested, nbRowsJumped);
-		ComputerService.findComputersPages(page);
+		ComputerService.findComputersPageSearchOrderBy(page, search, orderBy);
 		List<ComputerDTO> computersDTO = new ArrayList<ComputerDTO>();
 		for (Computer computer : page.getEntities()) {
 			computersDTO.add(ComputerMapper.mapComputerDTO(computer));
@@ -72,28 +93,6 @@ public class DashboardServlet extends HttpServlet {
 		pageDTO.setNbRowsJumped(nbRowsJumped);
 		pageDTO.setEntities(computersDTO);
 		pageDTO.setNbComputerFound(page.getNbComputerFound());
-	}
-
-	private void search(HttpServletRequest request, HttpServletResponse response, Page<ComputerDTO> pageDTO, String search) {
-		int pageRequested;
-		try {
-			pageRequested = Integer.parseInt(request.getParameter("page"));
-		}
-		catch (NumberFormatException e) {
-			pageRequested = 1;
-		}
-		int nbRowsJumped = Page.getNbRowsReturned() * (pageRequested-1);
-		Page<Computer> page = new Page<Computer>(pageRequested, nbRowsJumped);
-		ComputerService.findComputersPageSearch(page, search);
-		List<ComputerDTO> computersDTO = new ArrayList<ComputerDTO>();
-		for (Computer computer : page.getEntities()) {
-			computersDTO.add(ComputerMapper.mapComputerDTO(computer));
-		}
-		pageDTO.setPageNumber(pageRequested);
-		pageDTO.setNbRowsJumped(nbRowsJumped);
-		pageDTO.setEntities(computersDTO);
-		pageDTO.setNbComputerFound(page.getNbComputerFound());
-		request.setAttribute("search", search);
 	}
 
 	@Override
@@ -112,5 +111,5 @@ public class DashboardServlet extends HttpServlet {
 		this.doGet(request, response);
 	}
 
-	
+
 }

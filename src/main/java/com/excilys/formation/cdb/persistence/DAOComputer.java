@@ -8,11 +8,13 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.MatchResult;
 
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.mapper.DateMapper;
 import com.excilys.formation.cdb.model.Computer;
+import com.excilys.formation.cdb.model.OrderBy;
 import com.excilys.formation.cdb.model.Page;
 
 /**
@@ -22,6 +24,33 @@ import com.excilys.formation.cdb.model.Page;
  *
  */
 public class DAOComputer {
+
+	private static final String COMPUTERS_LIMIT_LIKE_ORDER = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
+			+ "company.id company_id, company.name company_name"
+			+ " from computer left join company on computer.company_id = company.id "
+			+ "where computer.name like ? or company.name like ? order by %s limit ?,?;";
+
+	private static final String COMPUTERS_LIMIT_LIKE = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
+			+ "company.id company_id, company.name company_name"
+			+ " from computer left join company on computer.company_id = company.id "
+			+ "where computer.name like ? or company.name like ? limit ?,?;";
+
+	private static final String COMPUTERS_LIMIT_ORDER = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
+			+ "company.id company_id, company.name company_name"
+			+ " from computer left join company on computer.company_id = company.id "
+			+ "order by %s limit ?,?;";
+
+	private static final String COMPUTERS_LIMIT = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
+			+ "company.id company_id, company.name company_name"
+			+ " from computer left join company on computer.company_id = company.id "
+			+ "limit ?,?;";
+
+	private static final String COMPUTERS_LIKE = "select count(computer.id)"
+			+ " from computer left join company on computer.company_id = company.id "
+			+ "where computer.name like ? or company.name like ?;";
+
+	private static final String COMPUTERS = "select count(computer.id)"
+			+ " from computer left join company on computer.company_id = company.id;";
 
 	/**
 	 * look for all computers
@@ -182,18 +211,29 @@ public class DAOComputer {
 		}
 	}
 
-	public static void findComputersPagesSearch(Page<Computer> page, String search) {
+	public static void findComputersPageSearchOrderBy(Page<Computer> page, String search, OrderBy orderBy) {
+		String request = null;
+		if(search != null && !search.equals("")) {
+			if(orderBy != null) {
+				request = String.format(COMPUTERS_LIMIT_LIKE_ORDER, orderMatch(orderBy));
+				
+			}
+			else {
+				request = COMPUTERS_LIMIT_LIKE;
+			}
+		}
+		else {
+			if(orderBy!= null) {
+				request = String.format(COMPUTERS_LIMIT_ORDER, orderMatch(orderBy));
+			}
+			else {
+				request = COMPUTERS_LIMIT;
+			}
+		}
 		List<Computer> computers = new ArrayList<>();
-		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
-				+ "company.id company_id, company.name company_name"
-				+ " from computer left join company on computer.company_id = company.id "
-				+ "where computer.name like ? or company.name like ? limit ?,?;";
 		try (Connection con = CDBConnection.getConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(request)) {
-			preparedStatement.setString(1, '%'+search+'%');
-			preparedStatement.setString(2, '%'+search+'%');
-			preparedStatement.setInt(3, page.getNbRowsJumped());
-			preparedStatement.setInt(4, Page.getNbRowsReturned());
+			fulfillPreparedStatement(preparedStatement, search, orderBy, page);
 			try(ResultSet rs = preparedStatement.executeQuery()){
 				while (rs.next()) {
 					Computer computer = ComputerMapper.mapSQLToComputer(rs);
@@ -204,13 +244,19 @@ public class DAOComputer {
 			e.printStackTrace();
 		}
 		page.setEntities(computers);
-		String request2 = "select count(computer.id)"
-				+ " from computer left join company on computer.company_id = company.id "
-				+ "where computer.name like ? or company.name like ?;";
+		String request2 = null;
+		if(search!=null && !search.equals("")) {
+			request2 = COMPUTERS_LIKE;
+		}
+		else {
+			request2 = COMPUTERS;
+		}
 		try (Connection con = CDBConnection.getConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(request2)) {
-			preparedStatement.setString(1, '%'+search+'%');
-			preparedStatement.setString(2, '%'+search+'%');
+			if(search!=null && !search.equals("")) {
+				preparedStatement.setString(1, '%'+search+'%');
+				preparedStatement.setString(2, '%'+search+'%');
+			}
 			try(ResultSet rs = preparedStatement.executeQuery()){
 				if (rs.next()) {
 					page.setNbComputerFound(rs.getInt("count(computer.id)"));
@@ -218,6 +264,32 @@ public class DAOComputer {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+	}
+	private static void fulfillPreparedStatement(PreparedStatement preparedStatement, String search, OrderBy orderBy, Page<Computer> page) throws SQLException {
+		if(search != null && !search.equals("")) {
+			preparedStatement.setString(1, '%'+search+'%');
+			preparedStatement.setString(2, '%'+search+'%');
+			preparedStatement.setInt(3, page.getNbRowsJumped());
+			preparedStatement.setInt(4, Page.getNbRowsReturned());
+		}
+		else {
+			preparedStatement.setInt(1, page.getNbRowsJumped());
+			preparedStatement.setInt(2, Page.getNbRowsReturned());
+		}
+	}
+	private static String orderMatch(OrderBy orderBy) {
+		switch (orderBy) {
+		case COMPANY_NAME:
+			return "company_name";
+		case COMPUTER_NAME:
+			return "computer_name";
+		case DISCONTINUED:
+			return "discontinued";
+		case INTRODUCED:
+			return "introduced";
+		default:
+			return null;
 		}
 	}
 }

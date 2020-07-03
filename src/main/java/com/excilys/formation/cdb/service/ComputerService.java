@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.model.Computer;
+import com.excilys.formation.cdb.model.OrderBy;
 import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.persistence.DAOComputer;
 
@@ -54,8 +55,8 @@ public class ComputerService {
 		return DAOComputer.getNbComputers();
 	}
 
-	public static void findComputersPageSearch(Page<Computer> page, String search) {
-		logger.info("findComputersPagesSearch");
-		DAOComputer.findComputersPagesSearch(page, search);		
+	public static void findComputersPageSearchOrderBy(Page<Computer> page, String search, OrderBy orderBy) {
+		logger.info("findComputersPageSearchOrderBy");
+		DAOComputer.findComputersPageSearchOrderBy(page, search, orderBy);		
 	}
 }

@@ -52,7 +52,7 @@ public class CDBConnection{
 	 * if null or closed then create a JDBC connection
 	 * @return
 	 */
-	public static Connection getConnection() {
+	public synchronized static Connection getConnection() {
 		logger.info("GetConnection()");
 		try {
 			if(connection == null || connection.isClosed()) {

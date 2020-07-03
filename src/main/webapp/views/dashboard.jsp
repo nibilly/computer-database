@@ -62,12 +62,12 @@
 									class="fa fa-trash-o fa-lg"></i>
 							</a>
 						</span></th>
-						<th>Computer name</th>
-						<th>Introduced date</th>
+						<th><a href="dashboard?search=${search}&page=1&orderBy=computer">Computer name</a></th>
+						<th><a href="dashboard?search=${search}&page=1&orderBy=introduced">Introduced date</a></th>
 						<!-- Table header for Discontinued Date -->
-						<th>Discontinued date</th>
+						<th><a href="dashboard?search=${search}&page=1&orderBy=discontinued">Discontinued date</a></th>
 						<!-- Table header for Company -->
-						<th>Company</th>
+						<th><a href="dashboard?search=${search}&page=1&orderBy=company">Company</a></th>
 
 					</tr>
 				</thead>
@@ -92,7 +92,7 @@
 		<div class="container text-center">
 			<ul class="pagination">
 				<c:if test="${page.pageNumber gt 1}">
-					<li><a href="dashboard?search=${search}&page=${page.pageNumber - 1}"
+					<li><a href="dashboard?search=${search}&page=${page.pageNumber - 1}&orderBy=${orderBy}"
 						aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
 					</a></li>
 				</c:if>
@@ -110,11 +110,11 @@
 						<c:choose>
 							<c:when test="${(pageIterator + i) eq page.pageNumber }">
 								<li class="active"><a
-									href="dashboard?search=${search}&page=${pageIterator+i}"><c:out
+									href="dashboard?search=${search}&page=${pageIterator+i}&orderBy=${orderBy}"><c:out
 											value="${pageIterator+i}"></c:out></a></li>
 							</c:when>
 							<c:otherwise>
-								<li><a href="dashboard?search=${search}&page=${pageIterator+i}"><c:out
+								<li><a href="dashboard?search=${search}&page=${pageIterator+i}&orderBy=${orderBy}"><c:out
 											value="${pageIterator+i}"></c:out></a></li>
 							</c:otherwise>
 						</c:choose>
@@ -122,7 +122,7 @@
 				</c:forEach>
 
 				<c:if test="${page.pageNumber lt nbPages}">
-					<li><a href="dashboard?search=${search}&page=${page.pageNumber + 1}"
+					<li><a href="dashboard?search=${search}&page=${page.pageNumber + 1}&orderBy=${orderBy}"
 						aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 					</a></li>
 				</c:if>
@@ -132,30 +132,30 @@
 				<c:choose>
 					<c:when test="${page.getNbRowsReturned() eq 10}">
 						<button type="button" class="btn btn-default active"
-							onClick="window.location.href='dashboard?search=${search}&nbRowsReturned=10'">10</button>
+							onClick="window.location.href='dashboard?search=${search}&orderBy=${orderBy}&nbRowsReturned=10'">10</button>
 					</c:when>
 					<c:otherwise>
 						<button type="button" class="btn btn-default"
-							onClick="window.location.href='dashboard?search=${search}&nbRowsReturned=10'">10</button>
+							onClick="window.location.href='dashboard?search=${search}&orderBy=${orderBy}&nbRowsReturned=10'">10</button>
 					</c:otherwise>
 				</c:choose>
 				<c:choose>
 					<c:when test="${page.getNbRowsReturned() eq 50}">
 						<button type="button" class="btn btn-default active"
-							onClick="window.location.href='dashboard?search=${search}&nbRowsReturned=50'">50</button>
+							onClick="window.location.href='dashboard?search=${search}&orderBy=${orderBy}&nbRowsReturned=50'">50</button>
 					</c:when>
 					<c:otherwise>
 						<button type="button" class="btn btn-default"
-							onClick="window.location.href='dashboard?search=${search}&nbRowsReturned=50'">50</button>
+							onClick="window.location.href='dashboard?search=${search}&orderBy=${orderBy}&nbRowsReturned=50'">50</button>
 					</c:otherwise>
 				</c:choose><c:choose>
 					<c:when test="${page.getNbRowsReturned() eq 100}">
 						<button type="button" class="btn btn-default active"
-							onClick="window.location.href='dashboard?search=${search}&nbRowsReturned=100'">100</button>
+							onClick="window.location.href='dashboard?search=${search}&orderBy=${orderBy}&nbRowsReturned=100'">100</button>
 					</c:when>
 					<c:otherwise>
 						<button type="button" class="btn btn-default"
-							onClick="window.location.href='dashboard?search=${search}&nbRowsReturned=100'">100</button>
+							onClick="window.location.href='dashboard?search=${search}&orderBy=${orderBy}&nbRowsReturned=100'">100</button>
 					</c:otherwise>
 				</c:choose>
 			</div>
