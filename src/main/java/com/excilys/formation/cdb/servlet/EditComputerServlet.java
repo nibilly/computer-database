@@ -22,12 +22,13 @@ import com.excilys.formation.cdb.validation.Validation;
 @WebServlet(urlPatterns = "/editComputer")
 public class EditComputerServlet extends HttpServlet {
 
-	private static final long serialVersionUID = 6164506264452118146L;
+	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String id = request.getParameter("computerId");
-		if(id == null) {
+		if (id == null) {
 			id = request.getParameter("id");
 		}
 		request.setAttribute("computerId", id);
@@ -41,7 +42,8 @@ public class EditComputerServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String id = request.getParameter("id");
 		String name = request.getParameter("name");
 		String introduced = request.getParameter("introduced");
@@ -49,17 +51,14 @@ public class EditComputerServlet extends HttpServlet {
 		String companyId = request.getParameter("company");
 		Computer computer = new Computer();
 		Validation validation = ComputerValidation.validation(id, name, introduced, discontinued, companyId, computer);
-		if(validation != Validation.NO_ERROR) {
+		if (validation != Validation.NO_ERROR) {
 			request.setAttribute("error", validation);
-		}
-		else
-		{
+		} else {
 			ComputerService.updateComputer(computer);
 			response.sendRedirect("/computer-database/dashboard");
 			return;
 		}
 		this.doGet(request, response);
 	}
-	
-	
+
 }
