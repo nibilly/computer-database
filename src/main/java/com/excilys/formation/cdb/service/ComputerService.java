@@ -13,13 +13,14 @@ import com.excilys.formation.cdb.persistence.DAOComputer;
 
 /**
  * DAO access
+ * 
  * @author nbilly
  *
  */
 public class ComputerService {
 
 	private static Logger logger = LoggerFactory.getLogger(ComputerService.class);
-	
+
 	public static void deleteComputerById(long computerId) {
 		logger.info("deleteComputerById");
 		DAOComputer.deleteComputerById(computerId);
@@ -49,7 +50,7 @@ public class ComputerService {
 		logger.info("findComputersPages");
 		DAOComputer.findComputersPages(page);
 	}
-	
+
 	public static int getNbComputers() {
 		logger.info("getNbComputers");
 		return DAOComputer.getNbComputers();
@@ -57,6 +58,6 @@ public class ComputerService {
 
 	public static void findComputersPageSearchOrderBy(Page<Computer> page, String search, OrderBy orderBy) {
 		logger.info("findComputersPageSearchOrderBy");
-		DAOComputer.findComputersPageSearchOrderBy(page, search, orderBy);		
+		DAOComputer.findComputersPageSearchOrderBy(page, search, orderBy);
 	}
 }

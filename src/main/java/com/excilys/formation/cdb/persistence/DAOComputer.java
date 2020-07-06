@@ -8,7 +8,6 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.MatchResult;
 
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
@@ -37,13 +36,11 @@ public class DAOComputer {
 
 	private static final String COMPUTERS_LIMIT_ORDER = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 			+ "company.id company_id, company.name company_name"
-			+ " from computer left join company on computer.company_id = company.id "
-			+ "order by %s limit ?,?;";
+			+ " from computer left join company on computer.company_id = company.id " + "order by %s limit ?,?;";
 
 	private static final String COMPUTERS_LIMIT = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 			+ "company.id company_id, company.name company_name"
-			+ " from computer left join company on computer.company_id = company.id "
-			+ "limit ?,?;";
+			+ " from computer left join company on computer.company_id = company.id " + "limit ?,?;";
 
 	private static final String COMPUTERS_LIKE = "select count(computer.id)"
 			+ " from computer left join company on computer.company_id = company.id "
@@ -63,7 +60,7 @@ public class DAOComputer {
 		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 				+ "company.id company_id, company.name company_name from computer join company on computer.company_id = company.id;";
 		try (Connection connection = CDBConnection.getConnection();
-				Statement statement= connection.createStatement();
+				Statement statement = connection.createStatement();
 				ResultSet resultSet = statement.executeQuery(request)) {
 			while (resultSet.next()) {
 				Computer computer = ComputerMapper.mapSQLToComputer(resultSet);
@@ -77,6 +74,7 @@ public class DAOComputer {
 
 	/**
 	 * select count(id) from computer;
+	 * 
 	 * @return number of computers
 	 */
 	public static int getNbComputers() {
@@ -84,7 +82,7 @@ public class DAOComputer {
 		String request = "select count(id) from computer;";
 		try (Connection connection = CDBConnection.getConnection();
 				Statement statement = connection.createStatement();
-				ResultSet resultSet = statement.executeQuery(request)){
+				ResultSet resultSet = statement.executeQuery(request)) {
 			if (resultSet.next()) {
 				nbComputers = resultSet.getInt("count(id)");
 			}
@@ -96,6 +94,7 @@ public class DAOComputer {
 
 	/**
 	 * look for computers with pagination
+	 * 
 	 * @param page the page have number of rows jumped and number of rows returned.
 	 *             Also the list of computers is returned by page.entities.
 	 */
@@ -107,7 +106,7 @@ public class DAOComputer {
 				PreparedStatement preparedStatement = con.prepareStatement(request)) {
 			preparedStatement.setInt(1, page.getNbRowsJumped());
 			preparedStatement.setInt(2, Page.getNbRowsReturned());
-			try(ResultSet rs = preparedStatement.executeQuery()){
+			try (ResultSet rs = preparedStatement.executeQuery()) {
 				while (rs.next()) {
 					Computer computer = ComputerMapper.mapSQLToComputer(rs);
 					computers.add(computer);
@@ -129,12 +128,12 @@ public class DAOComputer {
 	 */
 	public static Computer findById(long computerId) throws NoResultException {
 		Computer computer = null;
-		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, " 
+		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 				+ "company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id where computer.id = ?;";
 		try (Connection connection = CDBConnection.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)){
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setLong(1, computerId);
-			try(ResultSet resultSet = preparedStatement.executeQuery()){
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
 				if (resultSet.next()) {
 					computer = ComputerMapper.mapSQLToComputer(resultSet);
 				} else {
@@ -150,7 +149,7 @@ public class DAOComputer {
 	public static void createComputer(Computer computer) {
 		String request = "insert into computer(name, introduced, discontinued, company_id) values(?, ?, ?, ?);";
 		try (Connection connection = CDBConnection.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)){
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, computer.getName());
 			if (computer.getIntroduced() == null) {
 				preparedStatement.setNull(2, Types.DATE);
@@ -176,7 +175,7 @@ public class DAOComputer {
 	public static void updateComputer(Computer computer) {
 		String request = "update computer set name=?, introduced=?, discontinued=?, company_id=? where id=?;";
 		try (Connection connection = CDBConnection.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(request)){
+				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, computer.getName());
 			if (computer.getIntroduced() == null) {
 				preparedStatement.setNull(2, Types.VARCHAR);
@@ -213,20 +212,17 @@ public class DAOComputer {
 
 	public static void findComputersPageSearchOrderBy(Page<Computer> page, String search, OrderBy orderBy) {
 		String request = null;
-		if(search != null && !search.equals("")) {
-			if(orderBy != null) {
+		if (search != null && !search.equals("")) {
+			if (orderBy != null) {
 				request = String.format(COMPUTERS_LIMIT_LIKE_ORDER, orderMatch(orderBy));
-				
-			}
-			else {
+
+			} else {
 				request = COMPUTERS_LIMIT_LIKE;
 			}
-		}
-		else {
-			if(orderBy!= null) {
+		} else {
+			if (orderBy != null) {
 				request = String.format(COMPUTERS_LIMIT_ORDER, orderMatch(orderBy));
-			}
-			else {
+			} else {
 				request = COMPUTERS_LIMIT;
 			}
 		}
@@ -234,7 +230,7 @@ public class DAOComputer {
 		try (Connection con = CDBConnection.getConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(request)) {
 			fulfillPreparedStatement(preparedStatement, search, orderBy, page);
-			try(ResultSet rs = preparedStatement.executeQuery()){
+			try (ResultSet rs = preparedStatement.executeQuery()) {
 				while (rs.next()) {
 					Computer computer = ComputerMapper.mapSQLToComputer(rs);
 					computers.add(computer);
@@ -245,19 +241,18 @@ public class DAOComputer {
 		}
 		page.setEntities(computers);
 		String request2 = null;
-		if(search!=null && !search.equals("")) {
+		if (search != null && !search.equals("")) {
 			request2 = COMPUTERS_LIKE;
-		}
-		else {
+		} else {
 			request2 = COMPUTERS;
 		}
 		try (Connection con = CDBConnection.getConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(request2)) {
-			if(search!=null && !search.equals("")) {
-				preparedStatement.setString(1, '%'+search+'%');
-				preparedStatement.setString(2, '%'+search+'%');
+			if (search != null && !search.equals("")) {
+				preparedStatement.setString(1, '%' + search + '%');
+				preparedStatement.setString(2, '%' + search + '%');
 			}
-			try(ResultSet rs = preparedStatement.executeQuery()){
+			try (ResultSet rs = preparedStatement.executeQuery()) {
 				if (rs.next()) {
 					page.setNbComputerFound(rs.getInt("count(computer.id)"));
 				}
@@ -266,18 +261,20 @@ public class DAOComputer {
 			e.printStackTrace();
 		}
 	}
-	private static void fulfillPreparedStatement(PreparedStatement preparedStatement, String search, OrderBy orderBy, Page<Computer> page) throws SQLException {
-		if(search != null && !search.equals("")) {
-			preparedStatement.setString(1, '%'+search+'%');
-			preparedStatement.setString(2, '%'+search+'%');
+
+	private static void fulfillPreparedStatement(PreparedStatement preparedStatement, String search, OrderBy orderBy,
+			Page<Computer> page) throws SQLException {
+		if (search != null && !search.equals("")) {
+			preparedStatement.setString(1, '%' + search + '%');
+			preparedStatement.setString(2, '%' + search + '%');
 			preparedStatement.setInt(3, page.getNbRowsJumped());
 			preparedStatement.setInt(4, Page.getNbRowsReturned());
-		}
-		else {
+		} else {
 			preparedStatement.setInt(1, page.getNbRowsJumped());
 			preparedStatement.setInt(2, Page.getNbRowsReturned());
 		}
 	}
+
 	private static String orderMatch(OrderBy orderBy) {
 		switch (orderBy) {
 		case COMPANY_NAME:

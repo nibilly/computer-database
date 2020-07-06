@@ -15,6 +15,7 @@ import com.excilys.formation.cdb.model.Page;
 
 /**
  * mySQL company table access manager
+ * 
  * @author nbilly
  *
  */
@@ -22,15 +23,16 @@ public class DAOCompany {
 
 	/**
 	 * Select * from company;
+	 * 
 	 * @return all companies
 	 */
 	public static List<Company> findAll() {
 		List<Company> companies = new ArrayList<Company>();
 		String query = "Select id, name from company;";
-		try(Connection connection = CDBConnection.getConnection();
+		try (Connection connection = CDBConnection.getConnection();
 				Statement statement = connection.createStatement();
-				ResultSet resultSet = statement.executeQuery(query)){
-			while(resultSet.next()) {
+				ResultSet resultSet = statement.executeQuery(query)) {
+			while (resultSet.next()) {
 				Company company = CompanyMapper.mapSQLToCompany(resultSet);
 				companies.add(company);
 			}
@@ -42,6 +44,7 @@ public class DAOCompany {
 
 	/**
 	 * Select * from company where id = X;
+	 * 
 	 * @param companyId
 	 * @return a company
 	 * @throws NoResultException if request returns nothing
@@ -49,14 +52,13 @@ public class DAOCompany {
 	public static Company findById(long companyId) throws NoResultException {
 		Company company = null;
 		String query = "select * from company where id = ?;";
-		try(Connection connection = CDBConnection.getConnection();
-				PreparedStatement preparedStatement= connection.prepareStatement(query)){
+		try (Connection connection = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 			preparedStatement.setLong(1, companyId);
-			try(ResultSet resultSet = preparedStatement.executeQuery()){
-				if(resultSet.next()) {
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				if (resultSet.next()) {
 					company = CompanyMapper.mapSQLToCompany(resultSet);
-				}
-				else {
+				} else {
 					throw new NoResultException();
 				}
 			}
@@ -69,10 +71,10 @@ public class DAOCompany {
 	public static int getNbCompanies() {
 		int nbCompanies = 0;
 		String query = "select count(id) from company;";
-		try(Connection connection = CDBConnection.getConnection();
+		try (Connection connection = CDBConnection.getConnection();
 				Statement statement = connection.createStatement();
-				ResultSet resultSet = statement.executeQuery(query)){
-			if(resultSet.next()) {
+				ResultSet resultSet = statement.executeQuery(query)) {
+			if (resultSet.next()) {
 				nbCompanies = resultSet.getInt("count(id)");
 			}
 		} catch (SQLException e) {
@@ -84,12 +86,12 @@ public class DAOCompany {
 	public static void findAllPages(Page<Company> page) {
 		List<Company> companies = new ArrayList<Company>();
 		String query = "select * from company limit ?,?;";
-		try(Connection connection = CDBConnection.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(query)){
+		try (Connection connection = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 			preparedStatement.setInt(1, page.getNbRowsJumped());
 			preparedStatement.setInt(2, Page.getNbRowsReturned());
-			try(ResultSet resultSet = preparedStatement.executeQuery()){
-				while(resultSet.next()) {
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				while (resultSet.next()) {
 					Company company = CompanyMapper.mapSQLToCompany(resultSet);
 					companies.add(company);
 				}
@@ -98,5 +100,23 @@ public class DAOCompany {
 			e.printStackTrace();
 		}
 		page.setEntities(companies);
+	}
+
+	public static void delete(long companyId) {
+		String computerRequest = "delete from computer where company_id=?;";
+		String companyRequest = "delete from company where id=?;";
+		try (Connection connection = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(computerRequest)) {
+			preparedStatement.setLong(1, companyId);
+			preparedStatement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try (Connection connection = CDBConnection.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(companyRequest)) {
+			preparedStatement.setLong(1, companyId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }

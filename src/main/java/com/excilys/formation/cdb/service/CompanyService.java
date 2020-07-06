@@ -12,6 +12,7 @@ import com.excilys.formation.cdb.persistence.DAOCompany;
 
 /**
  * DAO access
+ * 
  * @author nbilly
  *
  */
@@ -22,7 +23,7 @@ public class CompanyService {
 		logger.info("findAll");
 		return DAOCompany.findAll();
 	}
-	
+
 	public static int getNbCompanies() {
 		logger.info("getNbCompanies");
 		return DAOCompany.getNbCompanies();
@@ -32,7 +33,7 @@ public class CompanyService {
 		logger.info("findCompanyPages");
 		DAOCompany.findAllPages(page);
 	}
-	
+
 	public static Company findById(long companyId) {
 		logger.info("findById");
 		Company company;
@@ -42,5 +43,10 @@ public class CompanyService {
 			company = null;
 		}
 		return company;
+	}
+
+	public static void delete(long companyId) {
+		logger.info("delete");
+		DAOCompany.delete(companyId);
 	}
 }
