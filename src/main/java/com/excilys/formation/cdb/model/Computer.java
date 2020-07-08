@@ -2,15 +2,20 @@ package com.excilys.formation.cdb.model;
 
 import java.time.LocalDate;
 
-import com.excilys.formation.cdb.exception.NoResultException;
-import com.excilys.formation.cdb.persistence.DAOCompany;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.excilys.formation.cdb.service.CompanyService;
 
 /**
  * A computer products by a Company
+ * 
  * @author nbilly
  *
  */
 public class Computer {
+	private static CompanyService companyService = (CompanyService) new ClassPathXmlApplicationContext("beans.xml")
+			.getBean("companyService");
+
 	/**
 	 * identification
 	 */
@@ -31,7 +36,7 @@ public class Computer {
 	 * a computer is produced by a company
 	 */
 	private Company company;
-	
+
 	public long getId() {
 		return id;
 	}
@@ -77,6 +82,7 @@ public class Computer {
 
 	/**
 	 * select from BD
+	 * 
 	 * @param id
 	 * @param name
 	 * @param introduced
@@ -84,16 +90,18 @@ public class Computer {
 	 * @param companyId
 	 * @param companyName
 	 */
-	public Computer(long id, String name, LocalDate introduced, LocalDate discontinued, long companyId, String companyName) {
+	public Computer(long id, String name, LocalDate introduced, LocalDate discontinued, long companyId,
+			String companyName) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
 		this.discontinued = discontinued;
 		this.company = new Company(companyId, companyName);
 	}
-	
+
 	/**
 	 * select from software(without id), go find the company in BD from companyId
+	 * 
 	 * @param name
 	 * @param introduced
 	 * @param discontinued
@@ -103,24 +111,18 @@ public class Computer {
 		this.name = name;
 		this.introduced = introduced;
 		this.discontinued = discontinued;
-		Company company;
-		try {
-			company = DAOCompany.findById(companyId);
-		} catch (NoResultException e) {
-			company = null;
-		}
-		this.company = company;
+		this.company = companyService.findById(companyId);
 	}
 
 	public Computer(Computer other) {
-		this(other.getId(), other.getName(), other.getIntroduced(), other.getDiscontinued(), 
-				other.getCompany().getId(), other.getCompany().getName());
+		this(other.getId(), other.getName(), other.getIntroduced(), other.getDiscontinued(), other.getCompany().getId(),
+				other.getCompany().getName());
 	}
 
 	@Override
 	public String toString() {
-		return "Computer [id=" + this.id + ", name=" + this.name + ", introduced=" + this.introduced + ", discontinued=" + this.discontinued
-				+ ", company=" + this.company + "]";
+		return "Computer [id=" + this.id + ", name=" + this.name + ", introduced=" + this.introduced + ", discontinued="
+				+ this.discontinued + ", company=" + this.company + "]";
 	}
 
 	@Override
@@ -168,7 +170,5 @@ public class Computer {
 			return false;
 		return true;
 	}
-	
-	
 
 }

@@ -23,24 +23,26 @@ import com.excilys.formation.cdb.model.Page;
 class DAOComputerTests {
 	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+	private DAOComputer daoComputer = new DAOComputer();
+
 	@Test
 	void findAll() {
-		List<Computer> computers = DAOComputer.findAll();
+		List<Computer> computers = daoComputer.findAll();
 		assertEquals(false, computers.isEmpty());
 	}
 
 	@Test
 	void getNbComputers() {
-		List<Computer> computers = DAOComputer.findAll();
-		int nbComputers = DAOComputer.getNbComputers();
+		List<Computer> computers = daoComputer.findAll();
+		int nbComputers = daoComputer.getNbComputers();
 		assertEquals(computers.size(), nbComputers);
 	}
 
 	@Test
 	void findComputersPages() {
-		List<Computer> computers = DAOComputer.findAll();
+		List<Computer> computers = daoComputer.findAll();
 		Page<Computer> page = new Page<Computer>(1, 1);
-		DAOComputer.findComputersPages(page);
+		daoComputer.findComputersPages(page);
 		assertEquals(computers.size() - 1, page.getEntities().size());
 		List<Computer> computersTest = new ArrayList<Computer>();
 		for (int i = 1; i < computers.size(); i++) {
@@ -51,9 +53,9 @@ class DAOComputerTests {
 
 	@Test
 	void findById() {
-		List<Computer> computers = DAOComputer.findAll();
+		List<Computer> computers = daoComputer.findAll();
 		try {
-			Computer computer = DAOComputer.findById(computers.get(0).getId());
+			Computer computer = daoComputer.findById(computers.get(0).getId());
 			assertEquals(computers.get(0), computer);
 		} catch (NoResultException e) {
 			e.printStackTrace();
@@ -62,10 +64,10 @@ class DAOComputerTests {
 
 	@Test
 	void createComputer() {
-		List<Computer> computers = DAOComputer.findAll();
+		List<Computer> computers = daoComputer.findAll();
 		Computer computerTest = new Computer(computers.get(0));
 		assertFalse(computerTest == computers.get(0));
-		DAOComputer.createComputer(computers.get(0));
+		daoComputer.createComputer(computers.get(0));
 		String query = "SELECT computer.id, computer.name computer_name, computer.introduced, computer.discontinued,"
 				+ " company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id ORDER BY computer.id DESC LIMIT 1";
 		try (Connection connection = CDBConnection.getConnection();
@@ -84,12 +86,12 @@ class DAOComputerTests {
 
 	@Test
 	void updateComputer() {
-		List<Computer> computers = DAOComputer.findAll();
+		List<Computer> computers = daoComputer.findAll();
 		Computer computer = computers.get(0);
 		computer.setIntroduced(LocalDate.parse("1998-01-01", dateTimeFormatter));
-		DAOComputer.updateComputer(computer); 
+		daoComputer.updateComputer(computer);
 		try {
-			Computer computerBD = DAOComputer.findById(computer.getId());
+			Computer computerBD = daoComputer.findById(computer.getId());
 			assertEquals(computer, computerBD);
 		} catch (NoResultException e) {
 			e.printStackTrace();
@@ -98,15 +100,16 @@ class DAOComputerTests {
 
 	@Test
 	void deleteComputerById() {
-		List<Computer> computers = DAOComputer.findAll();
+		List<Computer> computers = daoComputer.findAll();
 		boolean isSuppresed = false;
 		Computer computer = computers.get(0);
-		DAOComputer.deleteComputerById(computer.getId());
+		daoComputer.deleteComputerById(computer.getId());
 		try {
-			DAOComputer.findById(computer.getId());
+			daoComputer.findById(computer.getId());
 		} catch (NoResultException e) {
 			isSuppresed = true;
 		}
 		assertEquals(true, isSuppresed);
 	}
+
 }

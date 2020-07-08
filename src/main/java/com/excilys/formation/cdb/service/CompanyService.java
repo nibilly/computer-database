@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.model.Company;
@@ -16,37 +17,44 @@ import com.excilys.formation.cdb.persistence.DAOCompany;
  * @author nbilly
  *
  */
+@Service
 public class CompanyService {
 	private static Logger logger = LoggerFactory.getLogger(CompanyService.class);
 
-	public static List<Company> findAll() {
+	private DAOCompany daoCompany;
+
+	public void setDaoCompany(DAOCompany daoCompany) {
+		this.daoCompany = daoCompany;
+	}
+
+	public List<Company> findAll() {
 		logger.info("findAll");
-		return DAOCompany.findAll();
+		return daoCompany.findAll();
 	}
 
-	public static int getNbCompanies() {
+	public int getNbCompanies() {
 		logger.info("getNbCompanies");
-		return DAOCompany.getNbCompanies();
+		return daoCompany.getNbCompanies();
 	}
 
-	public static void findCompanyPages(Page<Company> page) {
+	public void findCompanyPages(Page<Company> page) {
 		logger.info("findCompanyPages");
-		DAOCompany.findAllPages(page);
+		daoCompany.findAllPages(page);
 	}
 
-	public static Company findById(long companyId) {
+	public Company findById(long companyId) {
 		logger.info("findById");
 		Company company;
 		try {
-			company = DAOCompany.findById(companyId);
+			company = daoCompany.findById(companyId);
 		} catch (NoResultException e) {
 			company = null;
 		}
 		return company;
 	}
 
-	public static void delete(long companyId) {
+	public void delete(long companyId) {
 		logger.info("delete");
-		DAOCompany.delete(companyId);
+		daoCompany.delete(companyId);
 	}
 }

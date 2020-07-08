@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import com.excilys.formation.cdb.dto.CompanyDTO;
 import com.excilys.formation.cdb.mapper.CompanyMapper;
 import com.excilys.formation.cdb.model.Company;
@@ -24,10 +26,15 @@ public class AddComputerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
+	private ComputerService computerService = (ComputerService) new ClassPathXmlApplicationContext("beans.xml")
+			.getBean("computerService");
+	private CompanyService companyService = (CompanyService) new ClassPathXmlApplicationContext("beans.xml")
+			.getBean("companyService");
+
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		List<Company> companies = CompanyService.findAll();
+		List<Company> companies = companyService.findAll();
 		List<CompanyDTO> companiesDTO = new ArrayList<CompanyDTO>();
 		for (Company company : companies) {
 			companiesDTO.add(CompanyMapper.mapCompanyDTO(company));
@@ -48,7 +55,7 @@ public class AddComputerServlet extends HttpServlet {
 		if (validation != Validation.NO_ERROR) {
 			request.setAttribute("error", validation);
 		} else {
-			ComputerService.createComputer(computer);
+			computerService.createComputer(computer);
 		}
 		doGet(request, response);
 	}

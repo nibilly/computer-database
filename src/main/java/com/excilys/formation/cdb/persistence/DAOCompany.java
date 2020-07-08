@@ -26,7 +26,7 @@ public class DAOCompany {
 	 * 
 	 * @return all companies
 	 */
-	public static List<Company> findAll() {
+	public List<Company> findAll() {
 		List<Company> companies = new ArrayList<Company>();
 		String query = "Select id, name from company;";
 		try (Connection connection = CDBConnection.getConnection();
@@ -49,7 +49,7 @@ public class DAOCompany {
 	 * @return a company
 	 * @throws NoResultException if request returns nothing
 	 */
-	public static Company findById(long companyId) throws NoResultException {
+	public Company findById(long companyId) throws NoResultException {
 		Company company = null;
 		String query = "select * from company where id = ?;";
 		try (Connection connection = CDBConnection.getConnection();
@@ -68,7 +68,7 @@ public class DAOCompany {
 		return company;
 	}
 
-	public static int getNbCompanies() {
+	public int getNbCompanies() {
 		int nbCompanies = 0;
 		String query = "select count(id) from company;";
 		try (Connection connection = CDBConnection.getConnection();
@@ -83,7 +83,7 @@ public class DAOCompany {
 		return nbCompanies;
 	}
 
-	public static void findAllPages(Page<Company> page) {
+	public void findAllPages(Page<Company> page) {
 		List<Company> companies = new ArrayList<Company>();
 		String query = "select * from company limit ?,?;";
 		try (Connection connection = CDBConnection.getConnection();
@@ -102,7 +102,7 @@ public class DAOCompany {
 		page.setEntities(companies);
 	}
 
-	public static void delete(long companyId) {
+	public void delete(long companyId) {
 		String computerRequest = "delete from computer where company_id=?;";
 		String companyRequest = "delete from company where id=?;";
 		try (Connection connection = CDBConnection.getConnection();

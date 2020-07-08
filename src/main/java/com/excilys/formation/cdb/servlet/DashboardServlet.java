@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import com.excilys.formation.cdb.dto.ComputerDTO;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
@@ -22,6 +24,9 @@ import com.excilys.formation.cdb.service.ComputerService;
 public class DashboardServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+
+	private ComputerService computerService = (ComputerService) new ClassPathXmlApplicationContext("beans.xml")
+			.getBean("computerService");
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -81,7 +86,7 @@ public class DashboardServlet extends HttpServlet {
 		}
 		int nbRowsJumped = Page.getNbRowsReturned() * (pageRequested - 1);
 		Page<Computer> page = new Page<Computer>(pageRequested, nbRowsJumped);
-		ComputerService.findComputersPageSearchOrderBy(page, search, orderBy);
+		computerService.findComputersPageSearchOrderBy(page, search, orderBy);
 		List<ComputerDTO> computersDTO = new ArrayList<ComputerDTO>();
 		for (Computer computer : page.getEntities()) {
 			computersDTO.add(ComputerMapper.mapComputerDTO(computer));
@@ -100,7 +105,7 @@ public class DashboardServlet extends HttpServlet {
 		for (String string : selections) {
 			try {
 				long id = Long.parseLong(string);
-				ComputerService.deleteComputerById(id);
+				computerService.deleteComputerById(id);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}

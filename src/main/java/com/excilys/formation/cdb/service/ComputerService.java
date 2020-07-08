@@ -21,43 +21,49 @@ public class ComputerService {
 
 	private static Logger logger = LoggerFactory.getLogger(ComputerService.class);
 
-	public static void deleteComputerById(long computerId) {
+	private DAOComputer daoComputer;
+
+	public void setDaoComputer(DAOComputer daoComputer) {
+		this.daoComputer = daoComputer;
+	}
+
+	public void deleteComputerById(long computerId) {
 		logger.info("deleteComputerById");
-		DAOComputer.deleteComputerById(computerId);
+		daoComputer.deleteComputerById(computerId);
 	}
 
-	public static void updateComputer(Computer computer) {
+	public void updateComputer(Computer computer) {
 		logger.info("updateComputer");
-		DAOComputer.updateComputer(computer);
+		daoComputer.updateComputer(computer);
 	}
 
-	public static void createComputer(Computer computer) {
+	public void createComputer(Computer computer) {
 		logger.info("createComputer");
-		DAOComputer.createComputer(computer);
+		daoComputer.createComputer(computer);
 	}
 
-	public static Computer findById(long computerId) throws NoResultException {
+	public Computer findById(long computerId) throws NoResultException {
 		logger.info("findById");
-		return DAOComputer.findById(computerId);
+		return daoComputer.findById(computerId);
 	}
 
-	public static List<Computer> findAll() {
+	public List<Computer> findAll() {
 		logger.info("findAll");
-		return DAOComputer.findAll();
+		return daoComputer.findAll();
 	}
 
-	public static void findComputersPages(Page<Computer> page) {
+	public void findComputersPages(Page<Computer> page) {
 		logger.info("findComputersPages");
-		DAOComputer.findComputersPages(page);
+		daoComputer.findComputersPages(page);
 	}
 
-	public static int getNbComputers() {
+	public int getNbComputers() {
 		logger.info("getNbComputers");
-		return DAOComputer.getNbComputers();
+		return daoComputer.getNbComputers();
 	}
 
-	public static void findComputersPageSearchOrderBy(Page<Computer> page, String search, OrderBy orderBy) {
+	public void findComputersPageSearchOrderBy(Page<Computer> page, String search, OrderBy orderBy) {
 		logger.info("findComputersPageSearchOrderBy");
-		DAOComputer.findComputersPageSearchOrderBy(page, search, orderBy);
+		daoComputer.findComputersPageSearchOrderBy(page, search, orderBy);
 	}
 }

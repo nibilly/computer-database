@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.model.Company;
@@ -27,6 +28,11 @@ public class CLI {
 	private static DateTimeFormatter dateTimeFormatter;
 	private static boolean continuerMenu;
 	private static boolean continuerPageRequest;
+
+	private static ComputerService computerService = (ComputerService) new ClassPathXmlApplicationContext("beans.xml")
+			.getBean("computerService");
+	private static CompanyService companyService = (CompanyService) new ClassPathXmlApplicationContext("beans.xml")
+			.getBean("companyService");
 
 	/**
 	 * Create a scanner, while user continue to respond call menu else close scanner
@@ -102,7 +108,7 @@ public class CLI {
 			System.out.print("CompanyId: ");
 			String line = scanner.nextLine();
 			long companyId = Long.parseLong(line);
-			company = CompanyService.findById(companyId);
+			company = companyService.findById(companyId);
 			if (company == null) {
 				System.out.println("Wrong company");
 				continuer = true;
@@ -111,14 +117,14 @@ public class CLI {
 		System.out.println(company);
 		System.out.print("Do you want to delete this company and its computers(N/o)? ");
 		if (scanner.nextLine().equals("o")) {
-			CompanyService.delete(company.getId());
+			companyService.delete(company.getId());
 		}
 	}
 
 	private static void deleteComputer() {
 		System.out.println("-Delete a computer--");
 		long computerId = askComputerId();// this method already ask for validation
-		ComputerService.deleteComputerById(computerId);
+		computerService.deleteComputerById(computerId);
 	}
 
 	private static void updateComputer() {
@@ -127,13 +133,13 @@ public class CLI {
 		System.out.println("New informations for this computer: ");
 		Computer computer = askComputerInformations();
 		computer.setId(computerId);
-		ComputerService.updateComputer(computer);
+		computerService.updateComputer(computer);
 	}
 
 	private static void createComputer() {
 		System.out.println("-Create a computer--");
 		Computer computer = askComputerInformations();
-		ComputerService.createComputer(computer);
+		computerService.createComputer(computer);
 	}
 
 	/**
@@ -225,7 +231,7 @@ public class CLI {
 				}
 			} while (!parsing);
 			try {
-				computer = ComputerService.findById(computerIdLong);
+				computer = computerService.findById(computerIdLong);
 			} catch (NoResultException e) {
 				System.out.println("computer doesn't exist");
 				computerExist = false;
@@ -253,7 +259,7 @@ public class CLI {
 		continuerPageRequest = true;
 		// Page display
 		do {
-			ComputerService.findComputersPages(actualPage);
+			computerService.findComputersPages(actualPage);
 			for (Computer computer : actualPage.getEntities()) {
 				StringBuffer stringBuffer = new StringBuffer();
 				stringBuffer.append("Computer [id=").append(computer.getId()).append(", name=")
@@ -263,7 +269,7 @@ public class CLI {
 			int pageRequested = 0;
 			// Page request
 			do {
-				int nbComputers = ComputerService.getNbComputers();
+				int nbComputers = computerService.getNbComputers();
 				int nbPages = nbComputers / Page.getNbRowsReturned();
 				if ((nbComputers % Page.getNbRowsReturned()) > 0) {
 					nbPages++;
@@ -316,7 +322,7 @@ public class CLI {
 		continuerPageRequest = true;
 		// Page display
 		do {
-			CompanyService.findCompanyPages(actualPage);
+			companyService.findCompanyPages(actualPage);
 			for (Company company : actualPage.getEntities()) {
 				StringBuffer stringBuffer = new StringBuffer();
 				stringBuffer.append("Company [id=").append(company.getId()).append(", name=").append(company.getName())
@@ -326,7 +332,7 @@ public class CLI {
 			int pageRequested = 0;
 			// Page request
 			do {
-				int nbCompanies = CompanyService.getNbCompanies();
+				int nbCompanies = companyService.getNbCompanies();
 				int nbPages = nbCompanies / Page.getNbRowsReturned();
 				if ((nbCompanies % Page.getNbRowsReturned()) > 0) {
 					nbPages++;

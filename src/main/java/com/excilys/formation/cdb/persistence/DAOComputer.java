@@ -54,7 +54,7 @@ public class DAOComputer {
 	 * 
 	 * @return computers
 	 */
-	public static List<Computer> findAll() {
+	public List<Computer> findAll() {
 		List<Computer> computers;
 		computers = new ArrayList<Computer>();
 		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
@@ -77,7 +77,7 @@ public class DAOComputer {
 	 * 
 	 * @return number of computers
 	 */
-	public static int getNbComputers() {
+	public int getNbComputers() {
 		int nbComputers = 0;
 		String request = "select count(id) from computer;";
 		try (Connection connection = CDBConnection.getConnection();
@@ -98,7 +98,7 @@ public class DAOComputer {
 	 * @param page the page have number of rows jumped and number of rows returned.
 	 *             Also the list of computers is returned by page.entities.
 	 */
-	public static void findComputersPages(Page<Computer> page) {
+	public void findComputersPages(Page<Computer> page) {
 		List<Computer> computers = new ArrayList<>();
 		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 				+ "company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id limit ?,?;";
@@ -126,7 +126,7 @@ public class DAOComputer {
 	 * @return a computer
 	 * @throws NoResultException
 	 */
-	public static Computer findById(long computerId) throws NoResultException {
+	public Computer findById(long computerId) throws NoResultException {
 		Computer computer = null;
 		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 				+ "company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id where computer.id = ?;";
@@ -146,7 +146,7 @@ public class DAOComputer {
 		return computer;
 	}
 
-	public static void createComputer(Computer computer) {
+	public void createComputer(Computer computer) {
 		String request = "insert into computer(name, introduced, discontinued, company_id) values(?, ?, ?, ?);";
 		try (Connection connection = CDBConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
@@ -172,7 +172,7 @@ public class DAOComputer {
 		}
 	}
 
-	public static void updateComputer(Computer computer) {
+	public void updateComputer(Computer computer) {
 		String request = "update computer set name=?, introduced=?, discontinued=?, company_id=? where id=?;";
 		try (Connection connection = CDBConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
@@ -199,7 +199,7 @@ public class DAOComputer {
 		}
 	}
 
-	public static void deleteComputerById(long computerId) {
+	public void deleteComputerById(long computerId) {
 		String request = "delete from computer where id=?;";
 		try (Connection connection = CDBConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
@@ -210,7 +210,7 @@ public class DAOComputer {
 		}
 	}
 
-	public static void findComputersPageSearchOrderBy(Page<Computer> page, String search, OrderBy orderBy) {
+	public void findComputersPageSearchOrderBy(Page<Computer> page, String search, OrderBy orderBy) {
 		String request = null;
 		if (search != null && !search.equals("")) {
 			if (orderBy != null) {
@@ -262,7 +262,7 @@ public class DAOComputer {
 		}
 	}
 
-	private static void fulfillPreparedStatement(PreparedStatement preparedStatement, String search, OrderBy orderBy,
+	private void fulfillPreparedStatement(PreparedStatement preparedStatement, String search, OrderBy orderBy,
 			Page<Computer> page) throws SQLException {
 		if (search != null && !search.equals("")) {
 			preparedStatement.setString(1, '%' + search + '%');
@@ -275,7 +275,7 @@ public class DAOComputer {
 		}
 	}
 
-	private static String orderMatch(OrderBy orderBy) {
+	private String orderMatch(OrderBy orderBy) {
 		switch (orderBy) {
 		case COMPANY_NAME:
 			return "company_name";

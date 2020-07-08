@@ -3,6 +3,9 @@ package com.excilys.formation.cdb.validation;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import com.excilys.formation.cdb.mapper.DateMapper;
 import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
@@ -10,49 +13,46 @@ import com.excilys.formation.cdb.service.CompanyService;
 import com.excilys.formation.cdb.service.ComputerService;
 
 public class ComputerValidation {
+	private static CompanyService companyService = (CompanyService) new ClassPathXmlApplicationContext("beans.xml")
+			.getBean("companyService");
 
-
-	public static Validation validation(String name, String introduced, String discontinued, String companyId, Computer computer) {
+	public static Validation validation(String name, String introduced, String discontinued, String companyId,
+			Computer computer) {
 		Validation validation = Validation.NO_ERROR;
 		LocalDate introducedDate;
 		LocalDate discontinuedDate;
 		long companyIdLong;
-		if(name == null || name.equals("")) {
+		if (name == null || name.equals("")) {
 			validation = Validation.NAME_ERROR;
-		}
-		else {
+		} else {
 			computer.setName(name);
 			try {
-				introducedDate = (introduced.equals(""))?null:DateMapper.localDateFromString(introduced);
+				introducedDate = (introduced.equals("")) ? null : DateMapper.localDateFromString(introduced);
 				computer.setIntroduced(introducedDate);
 				try {
-					discontinuedDate = (discontinued.equals(""))?null:DateMapper.localDateFromString(discontinued);
+					discontinuedDate = (discontinued.equals("")) ? null : DateMapper.localDateFromString(discontinued);
 					computer.setDiscontinued(discontinuedDate);
-					if(introducedDate != null && discontinuedDate != null) {
-						if(introducedDate.compareTo(discontinuedDate) >=0) {
+					if (introducedDate != null && discontinuedDate != null) {
+						if (introducedDate.compareTo(discontinuedDate) >= 0) {
 							validation = Validation.DATE_PRECEDENCE_ERROR;
 							return validation;
 						}
 					}
 					try {
 						companyIdLong = Long.parseLong(companyId);
-						if(companyIdLong > -1 && companyIdLong < CompanyService.getNbCompanies()) {
-							Company company = CompanyService.findById(companyIdLong);
+						if (companyIdLong > -1 && companyIdLong < companyService.getNbCompanies()) {
+							Company company = companyService.findById(companyIdLong);
 							computer.setCompany(company);
-						}
-						else {
+						} else {
 							throw new NumberFormatException();
 						}
-					}
-					catch(NumberFormatException e) {
+					} catch (NumberFormatException e) {
 						validation = Validation.COMPANY_ERROR;
 					}
-				}
-				catch(DateTimeParseException e) {
+				} catch (DateTimeParseException e) {
 					validation = Validation.DISCONTINUED_DATE_ERROR;
 				}
-			}
-			catch(DateTimeParseException e) {
+			} catch (DateTimeParseException e) {
 				validation = Validation.INTRODUCED_DATE_ERROR;
 			}
 		}
@@ -65,15 +65,15 @@ public class ComputerValidation {
 		Validation validation = Validation.NO_ERROR;
 		try {
 			long idLong = Long.parseLong(id);
-			if(idLong > 0 && idLong < ComputerService.getNbComputers()) {
+			ApplicationContext applicationContext = new ClassPathXmlApplicationContext("beans.xml");
+			ComputerService computerService = (ComputerService) applicationContext.getBean("computerService");
+			if (idLong > 0 && idLong < computerService.getNbComputers()) {
 				computer.setId(idLong);
 				validation = ComputerValidation.validation(name, introduced, discontinued, companyId, computer);
-			}
-			else {
+			} else {
 				throw new NumberFormatException();
 			}
-		}
-		catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			validation = Validation.ID_ERROR;
 		}
 		return validation;

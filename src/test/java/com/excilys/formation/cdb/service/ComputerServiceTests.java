@@ -19,29 +19,36 @@ import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.persistence.CDBConnection;
+import com.excilys.formation.cdb.persistence.DAOComputer;
 
 class ComputerServiceTests {
 	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+	private ComputerService computerService;
+
+	public ComputerServiceTests() {
+		computerService = new ComputerService();
+		computerService.setDaoComputer(new DAOComputer());
+	}
+
 	@Test
 	void FindAll() {
-		List<Computer> computers = ComputerService.findAll();
+		List<Computer> computers = computerService.findAll();
 		assertEquals(false, computers.isEmpty());
-
 	}
 
 	@Test
 	void getNbComputers() {
-		List<Computer> computers = ComputerService.findAll();
-		int nbComputers = ComputerService.getNbComputers();
+		List<Computer> computers = computerService.findAll();
+		int nbComputers = computerService.getNbComputers();
 		assertEquals(computers.size(), nbComputers);
 	}
 
 	@Test
 	void findComputersPages() {
-		List<Computer> computers = ComputerService.findAll();
+		List<Computer> computers = computerService.findAll();
 		Page<Computer> page = new Page<Computer>(1, 1);
-		ComputerService.findComputersPages(page);
+		computerService.findComputersPages(page);
 		assertEquals(computers.size() - 1, page.getEntities().size());
 		List<Computer> computersTest = new ArrayList<Computer>();
 		for (int i = 1; i < computers.size(); i++) {
@@ -52,9 +59,9 @@ class ComputerServiceTests {
 
 	@Test
 	void findById() {
-		List<Computer> computers = ComputerService.findAll();
+		List<Computer> computers = computerService.findAll();
 		try {
-			Computer computer = ComputerService.findById(computers.get(0).getId());
+			Computer computer = computerService.findById(computers.get(0).getId());
 			assertEquals(computers.get(0), computer);
 		} catch (NoResultException e) {
 			e.printStackTrace();
@@ -63,10 +70,10 @@ class ComputerServiceTests {
 
 	@Test
 	void createComputer() {
-		List<Computer> computers = ComputerService.findAll();
+		List<Computer> computers = computerService.findAll();
 		Computer computerTest = computers.get(0);
 		computerTest.setId(0L);
-		ComputerService.createComputer(computers.get(0));
+		computerService.createComputer(computers.get(0));
 		String query = "SELECT computer.id, computer.name computer_name, computer.introduced, computer.discontinued,"
 				+ " company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id ORDER BY computer.id DESC LIMIT 1";
 		try (Connection connection = CDBConnection.getConnection();
@@ -84,12 +91,12 @@ class ComputerServiceTests {
 
 	@Test
 	void updateComputer() {
-		List<Computer> computers = ComputerService.findAll();
+		List<Computer> computers = computerService.findAll();
 		Computer computer = computers.get(0);
 		computer.setIntroduced(LocalDate.parse("1997-01-01", dateTimeFormatter));
-		ComputerService.updateComputer(computer);
+		computerService.updateComputer(computer);
 		try {
-			Computer computerBD = ComputerService.findById(computer.getId());
+			Computer computerBD = computerService.findById(computer.getId());
 			assertEquals(computer, computerBD);
 		} catch (NoResultException e) {
 			e.printStackTrace();
@@ -98,12 +105,12 @@ class ComputerServiceTests {
 
 	@Test
 	void deleteComputerById() {
-		List<Computer> computers = ComputerService.findAll();
+		List<Computer> computers = computerService.findAll();
 		boolean isSuppresed = false;
 		Computer computer = computers.get(0);
-		ComputerService.deleteComputerById(computer.getId());
+		computerService.deleteComputerById(computer.getId());
 		try {
-			ComputerService.findById(computer.getId());
+			computerService.findById(computer.getId());
 		} catch (NoResultException e) {
 			isSuppresed = true;
 		}

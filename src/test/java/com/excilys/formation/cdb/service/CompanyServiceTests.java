@@ -14,24 +14,31 @@ import com.excilys.formation.cdb.persistence.DAOCompany;
 
 class CompanyServiceTests {
 
+	private CompanyService companyService;
+
+	public CompanyServiceTests() {
+		companyService = new CompanyService();
+		companyService.setDaoCompany(new DAOCompany());
+	}
+
 	@Test
 	void FindAll() {
-		List<Company> companies = CompanyService.findAll();
+		List<Company> companies = companyService.findAll();
 		assertEquals(false, companies.isEmpty());
 	}
 
 	@Test
 	void getNbCompanies() {
-		List<Company> companies = CompanyService.findAll();
-		int nbCompanies = DAOCompany.getNbCompanies();
+		List<Company> companies = companyService.findAll();
+		int nbCompanies = companyService.getNbCompanies();
 		assertEquals(companies.size(), nbCompanies);
 	}
 
 	@Test
 	void findAllPages() {
-		List<Company> companies = CompanyService.findAll();
+		List<Company> companies = companyService.findAll();
 		Page<Company> page = new Page<Company>(1, 1);
-		CompanyService.findCompanyPages(page);
+		companyService.findCompanyPages(page);
 		assertEquals(companies.size() - 1, page.getEntities().size());
 		List<Company> companiesTest = new ArrayList<Company>();
 		for (int i = 1; i < companies.size(); i++) {
