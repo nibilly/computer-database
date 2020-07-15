@@ -4,6 +4,7 @@ import java.util.List;
 
 /**
  * a computer or company page for pagination
+ * 
  * @author nbilly
  *
  */
@@ -24,8 +25,12 @@ public class Page<T> {
 	 * number of rows jumped (offset)
 	 */
 	private int nbRowsJumped;
-	
+
 	private int nbComputerFound;
+
+	private String search;
+
+	private OrderBy orderBy;
 
 	public int getPageNumber() {
 		return this.pageNumber;
@@ -42,7 +47,7 @@ public class Page<T> {
 	public void setEntities(List<T> entities) {
 		this.entities = entities;
 	}
-		
+
 	public int getNbRowsJumped() {
 		return nbRowsJumped;
 	}
@@ -65,6 +70,22 @@ public class Page<T> {
 
 	public void setNbComputerFound(int nbComputerFound) {
 		this.nbComputerFound = nbComputerFound;
+	}
+
+	public String getSearch() {
+		return search;
+	}
+
+	public void setSearch(String search) {
+		this.search = search;
+	}
+
+	public OrderBy getOrderBy() {
+		return orderBy;
+	}
+
+	public void setOrderBy(OrderBy orderBy) {
+		this.orderBy = orderBy;
 	}
 
 	public Page() {

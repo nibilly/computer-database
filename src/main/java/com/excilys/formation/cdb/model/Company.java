@@ -2,6 +2,7 @@ package com.excilys.formation.cdb.model;
 
 /**
  * A company products Computers
+ * 
  * @author nbilly
  *
  */
@@ -14,21 +15,26 @@ public class Company {
 	 * complete computer name
 	 */
 	private String name;
-	
+
 	public long getId() {
 		return id;
 	}
+
 	public void setId(long id) {
 		this.id = id;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public Company() {
 	}
+
 	/**
 	 * select from BD
 	 */
@@ -36,14 +42,12 @@ public class Company {
 		this.id = id;
 		this.name = name;
 	}
-	public Company(Company other) {
-		this(other.getId(), other.getName());
-	}
-	
+
 	@Override
 	public String toString() {
 		return "Company [id=" + this.id + ", name=" + this.name + "]";
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -52,6 +56,7 @@ public class Company {
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

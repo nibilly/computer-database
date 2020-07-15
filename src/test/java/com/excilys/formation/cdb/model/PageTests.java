@@ -1,14 +1,14 @@
 package com.excilys.formation.cdb.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-class PageTests<T> {
+public class PageTests {
 
 	private final List<Computer> computers = new ArrayList<Computer>() {
 		private static final long serialVersionUID = 1L;
@@ -29,7 +29,7 @@ class PageTests<T> {
 	};
 
 	@Test
-	void constructorComputerFull() {
+	public void constructorComputerFull() {
 		Page<Computer> page = new Page<Computer>(1, 10);
 		page.setEntities(computers);
 		assertEquals(1, page.getPageNumber());
@@ -39,7 +39,7 @@ class PageTests<T> {
 	}
 
 	@Test
-	void settersComputer() {
+	public void settersComputer() {
 		Page<Computer> page = new Page<Computer>();
 		page.setNbRowsJumped(10);
 		page.setPageNumber(1);
@@ -51,7 +51,7 @@ class PageTests<T> {
 	}
 
 	@Test
-	void constructorCompanyFull() {
+	public void constructorCompanyFull() {
 		Page<Company> page = new Page<Company>(1, 10);
 		page.setEntities(companies);
 		assertEquals(1, page.getPageNumber());
@@ -61,7 +61,7 @@ class PageTests<T> {
 	}
 
 	@Test
-	void settersCompany() {
+	public void settersCompany() {
 		Page<Company> page = new Page<Company>();
 		page.setNbRowsJumped(10);
 		page.setPageNumber(1);
@@ -70,5 +70,28 @@ class PageTests<T> {
 		assertEquals(10, page.getNbRowsJumped());
 		assertEquals(companies.get(0), page.getEntities().get(0));
 		assertEquals(companies.get(1), page.getEntities().get(1));
+	}
+
+	@Test
+	public void search() {
+		Page<Computer> page = new Page<Computer>();
+		page.setSearch("computer");
+		assertEquals("computer", page.getSearch());
+	}
+
+	@Test
+	public void orderBy() {
+		Page<Computer> page = new Page<Computer>();
+		page.setOrderBy(OrderBy.COMPANY_NAME);
+		assertEquals(OrderBy.COMPANY_NAME, page.getOrderBy());
+		page = new Page<Computer>();
+		page.setOrderBy(OrderBy.COMPUTER_NAME);
+		assertEquals(OrderBy.COMPUTER_NAME, page.getOrderBy());
+		page = new Page<Computer>();
+		page.setOrderBy(OrderBy.DISCONTINUED);
+		assertEquals(OrderBy.DISCONTINUED, page.getOrderBy());
+		page = new Page<Computer>();
+		page.setOrderBy(OrderBy.INTRODUCED);
+		assertEquals(OrderBy.INTRODUCED, page.getOrderBy());
 	}
 }

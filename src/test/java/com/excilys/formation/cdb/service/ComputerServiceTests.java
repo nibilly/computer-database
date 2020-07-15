@@ -1,8 +1,8 @@
 package com.excilys.formation.cdb.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,78 +11,122 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
-import org.junit.jupiter.api.Test;
+import org.dbunit.DBTestCase;
+import org.dbunit.PropertiesBasedJdbcDatabaseTester;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.dbunit.operation.DatabaseOperation;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.persistence.CDBConnection;
-import com.excilys.formation.cdb.persistence.DAOComputer;
+import com.excilys.formation.cdb.servlet.ContextFactory;
+import com.zaxxer.hikari.HikariDataSource;
 
-class ComputerServiceTests {
-	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+public class ComputerServiceTests extends DBTestCase {
+	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE;
 
 	private ComputerService computerService;
 
-	public ComputerServiceTests() {
-		computerService = new ComputerService();
-		computerService.setDaoComputer(new DAOComputer());
+	private CDBConnection cdbConnection;
+
+	public ComputerServiceTests(String name) {
+		super(name);
+
+		try {
+			InputStream inputStream = new FileInputStream("src/test/resources/local.properties");
+			Properties properties = new Properties();
+			properties.load(inputStream);
+
+			String url = properties.getProperty("db.url");
+			String username = properties.getProperty("db.username");
+			String password = properties.getProperty("db.password");
+			String driver = properties.getProperty("db.driver");
+
+			System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_DRIVER_CLASS, driver);
+			System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_CONNECTION_URL, url);
+			System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_USERNAME, username);
+			System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_PASSWORD, password);
+			inputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		cdbConnection = (CDBConnection) ContextFactory.getApplicationContext().getBean("cdbConnection");
+		computerService = (ComputerService) ContextFactory.getApplicationContext().getBean("computerService");
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		try (Connection connection = (Connection) ((HikariDataSource) ContextFactory.getApplicationContext()
+				.getBean("dataSource")).getConnection()) {
+			DatabaseConnection dbConnection = new DatabaseConnection(connection);
+			getSetUpOperation().execute(dbConnection, getDataSet());
+		}
+	}
+
+	@Override
+	protected DatabaseOperation getSetUpOperation() throws Exception {
+		return DatabaseOperation.CLEAN_INSERT;
+	}
+
+	@Override
+	protected IDataSet getDataSet() throws Exception {
+		return new FlatXmlDataSetBuilder().build(new FileInputStream("src/test/resources/dataset.xml"));
 	}
 
 	@Test
-	void FindAll() {
-		List<Computer> computers = computerService.findAll();
-		assertEquals(false, computers.isEmpty());
-	}
-
-	@Test
-	void getNbComputers() {
-		List<Computer> computers = computerService.findAll();
+	public void testGetNbComputers() {
 		int nbComputers = computerService.getNbComputers();
-		assertEquals(computers.size(), nbComputers);
+		assertEquals(4, nbComputers);
 	}
 
 	@Test
-	void findComputersPages() {
-		List<Computer> computers = computerService.findAll();
+	public void testFindComputersPages() {
 		Page<Computer> page = new Page<Computer>(1, 1);
 		computerService.findComputersPages(page);
-		assertEquals(computers.size() - 1, page.getEntities().size());
+		assertEquals(3, page.getEntities().size());
 		List<Computer> computersTest = new ArrayList<Computer>();
-		for (int i = 1; i < computers.size(); i++) {
-			computersTest.add(computers.get(i));
-		}
-		assertTrue(page.getEntities().containsAll(computersTest));
+		Computer computer = page.getEntities().get(0);
+		assertEquals(2, computer.getId());
+		assertEquals("CM-2a", computer.getName());
+		assertEquals("1980-02-01", computer.getIntroduced().toString());
+		assertNull(computer.getDiscontinued());
+		assertEquals(2, computer.getCompany().getId());
+		assertEquals("Thinking Machines", computer.getCompany().getName());
 	}
 
 	@Test
-	void findById() {
-		List<Computer> computers = computerService.findAll();
+	public void testFindById() {
 		try {
-			Computer computer = computerService.findById(computers.get(0).getId());
-			assertEquals(computers.get(0), computer);
+			Computer computer = computerService.findById(2);
+			assertEquals("CM-2a", computer.getName());
 		} catch (NoResultException e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	void createComputer() {
-		List<Computer> computers = computerService.findAll();
-		Computer computerTest = computers.get(0);
-		computerTest.setId(0L);
-		computerService.createComputer(computers.get(0));
+	public void testCreateComputer() {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE;
+		Computer computer = new Computer("name", LocalDate.parse("1980-05-04", dateTimeFormatter),
+				LocalDate.parse("2000-12-31", dateTimeFormatter), 2);
+		computerService.createComputer(computer);
 		String query = "SELECT computer.id, computer.name computer_name, computer.introduced, computer.discontinued,"
 				+ " company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id ORDER BY computer.id DESC LIMIT 1";
-		try (Connection connection = CDBConnection.getConnection();
+		try (Connection connection = cdbConnection.getConnection();
 				Statement statement = connection.createStatement();
 				ResultSet resultSet = statement.executeQuery(query)) {
 			if (resultSet.next()) {
-				Computer computer = ComputerMapper.mapSQLToComputer(resultSet);
-				computerTest.setId(computer.getId());
-				assertEquals(computer, computerTest);
+				Computer computer1 = ComputerMapper.mapSQLToComputer(resultSet);
+				computer.setId(computer1.getId());
+				assertEquals(computer, computer1);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -90,27 +134,24 @@ class ComputerServiceTests {
 	}
 
 	@Test
-	void updateComputer() {
-		List<Computer> computers = computerService.findAll();
-		Computer computer = computers.get(0);
-		computer.setIntroduced(LocalDate.parse("1997-01-01", dateTimeFormatter));
-		computerService.updateComputer(computer);
+	public void testUpdateComputer() {
 		try {
-			Computer computerBD = computerService.findById(computer.getId());
-			assertEquals(computer, computerBD);
+			Computer computer = computerService.findById(3);
+			computer.setIntroduced(LocalDate.parse("1997-01-01", dateTimeFormatter));
+			computerService.updateComputer(computer);
+			Computer computer1 = computerService.findById(3);
+			assertEquals(computer, computer1);
 		} catch (NoResultException e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	void deleteComputerById() {
-		List<Computer> computers = computerService.findAll();
+	public void testDeleteComputerById() {
 		boolean isSuppresed = false;
-		Computer computer = computers.get(0);
-		computerService.deleteComputerById(computer.getId());
+		computerService.deleteComputerById(4);
 		try {
-			computerService.findById(computer.getId());
+			computerService.findById(4);
 		} catch (NoResultException e) {
 			isSuppresed = true;
 		}

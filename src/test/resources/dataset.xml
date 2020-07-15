@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+	<company id='1' name='Apple Inc.' />
+
+	<company id='2' name='Thinking Machines' />
+	
+	<computer id='1' name='un' introduced='1999-01-01' discontinued='2000-12-31' company_id='1' />
+	
+	<computer id='2' name='CM-2a' introduced='1980-02-01' company_id='2' />
+
+	<computer id='3' name='CM-200' company_id='2' />
+
+	<computer id='4' name='CM-5e' />
+</dataset>

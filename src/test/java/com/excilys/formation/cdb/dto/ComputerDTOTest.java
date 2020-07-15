@@ -1,13 +1,13 @@
 package com.excilys.formation.cdb.dto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class ComputerDTOTest {
 
 	@Test
-	void computerDTOComstructorFull() {
+	public void computerDTOComstructorFull() {
 		String id = "1";
 		String name = "name";
 		String introduced = "1991-01-01";
@@ -24,7 +24,7 @@ public class ComputerDTOTest {
 	}
 
 	@Test
-	void computerDTOComstructorEmpty() {
+	public void computerDTOComstructorEmpty() {
 		String id = "1";
 		String name = "name";
 		String introduced = "1991-01-01";

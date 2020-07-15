@@ -1,18 +1,18 @@
 package com.excilys.formation.cdb.mapper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.sql.Date;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-class DateMapperTests {
+public class DateMapperTests {
 	@Test
-	@SuppressWarnings( "deprecation" )
-	void equality() {
+	@SuppressWarnings("deprecation")
+	public void equality() {
 		long now = System.currentTimeMillis();
 		Date date = new Date(now);
 		LocalDate localDate = Instant.ofEpochMilli(now).atZone(ZoneId.systemDefault()).toLocalDate();

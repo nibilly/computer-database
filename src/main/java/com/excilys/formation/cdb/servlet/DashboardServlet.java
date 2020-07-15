@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import com.excilys.formation.cdb.dto.ComputerDTO;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
@@ -25,8 +23,11 @@ public class DashboardServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private ComputerService computerService = (ComputerService) new ClassPathXmlApplicationContext("beans.xml")
-			.getBean("computerService");
+	private ComputerService computerService;
+
+	public DashboardServlet() {
+		computerService = (ComputerService) ContextFactory.getApplicationContext().getBean("computerService");
+	}
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -40,6 +41,7 @@ public class DashboardServlet extends HttpServlet {
 		Page<ComputerDTO> page = new Page<ComputerDTO>(1, 0);
 		String search = request.getParameter("search");
 		request.setAttribute("search", search);
+		page.setSearch(search);
 		String orderByString = request.getParameter("orderBy");
 		request.setAttribute("orderBy", orderByString);
 		OrderBy orderBy = null;
@@ -62,8 +64,9 @@ public class DashboardServlet extends HttpServlet {
 				break;
 			}
 		}
+		page.setOrderBy(orderBy);
 
-		listComputers(request, response, page, search, orderBy);
+		listComputers(request, response, page);
 		request.setAttribute("page", page);
 		int nbComputers = page.getNbComputerFound();
 		request.setAttribute("nbComputers", nbComputers + "");
@@ -76,8 +79,7 @@ public class DashboardServlet extends HttpServlet {
 		this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
 	}
 
-	private void listComputers(HttpServletRequest request, HttpServletResponse response, Page<ComputerDTO> pageDTO,
-			String search, OrderBy orderBy) {
+	private void listComputers(HttpServletRequest request, HttpServletResponse response, Page<ComputerDTO> pageDTO) {
 		int pageRequested;
 		try {
 			pageRequested = Integer.parseInt(request.getParameter("page"));
@@ -86,7 +88,9 @@ public class DashboardServlet extends HttpServlet {
 		}
 		int nbRowsJumped = Page.getNbRowsReturned() * (pageRequested - 1);
 		Page<Computer> page = new Page<Computer>(pageRequested, nbRowsJumped);
-		computerService.findComputersPageSearchOrderBy(page, search, orderBy);
+		page.setSearch(pageDTO.getSearch());
+		page.setOrderBy(pageDTO.getOrderBy());
+		computerService.findComputersPageSearchOrderBy(page);
 		List<ComputerDTO> computersDTO = new ArrayList<ComputerDTO>();
 		for (Computer computer : page.getEntities()) {
 			computersDTO.add(ComputerMapper.mapComputerDTO(computer));

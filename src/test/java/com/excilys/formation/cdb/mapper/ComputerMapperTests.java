@@ -1,30 +1,30 @@
 package com.excilys.formation.cdb.mapper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.excilys.formation.cdb.dto.ComputerDTO;
 import com.excilys.formation.cdb.model.Computer;
 
-class ComputerMapperTests {
-	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+public class ComputerMapperTests {
+	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE;
 
-	@BeforeEach
+	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
-	void mapSQLTocomputer() {
+	public void mapSQLTocomputer() {
 		ResultSet resultSet = Mockito.mock(ResultSet.class);
 		Computer computerTest = new Computer(2, "name", LocalDate.parse("1998-01-01", dateTimeFormatter),
 				LocalDate.parse("2003-01-01", dateTimeFormatter), 2, "CompanyName");
@@ -51,7 +51,7 @@ class ComputerMapperTests {
 	}
 
 	@Test
-	void mapComputerDTO() {
+	public void mapComputerDTO() {
 		long id = 1L;
 		String name = "name";
 		LocalDate introduced = LocalDate.parse("1995-01-01", dateTimeFormatter);

@@ -2,9 +2,8 @@ package com.excilys.formation.cdb.model;
 
 import java.time.LocalDate;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import com.excilys.formation.cdb.service.CompanyService;
+import com.excilys.formation.cdb.servlet.ContextFactory;
 
 /**
  * A computer products by a Company
@@ -13,7 +12,7 @@ import com.excilys.formation.cdb.service.CompanyService;
  *
  */
 public class Computer {
-	private static CompanyService companyService = (CompanyService) new ClassPathXmlApplicationContext("beans.xml")
+	private static CompanyService companyService = (CompanyService) ContextFactory.getApplicationContext()
 			.getBean("companyService");
 
 	/**

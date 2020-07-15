@@ -24,6 +24,12 @@ import com.excilys.formation.cdb.model.Page;
  */
 public class DAOComputer {
 
+	private CDBConnection cdbConnection;
+
+	public void setCdbConnection(CDBConnection cdbConnection) {
+		this.cdbConnection = cdbConnection;
+	}
+
 	private static final String COMPUTERS_LIMIT_LIKE_ORDER = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 			+ "company.id company_id, company.name company_name"
 			+ " from computer left join company on computer.company_id = company.id "
@@ -59,7 +65,7 @@ public class DAOComputer {
 		computers = new ArrayList<Computer>();
 		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 				+ "company.id company_id, company.name company_name from computer join company on computer.company_id = company.id;";
-		try (Connection connection = CDBConnection.getConnection();
+		try (Connection connection = cdbConnection.getConnection();
 				Statement statement = connection.createStatement();
 				ResultSet resultSet = statement.executeQuery(request)) {
 			while (resultSet.next()) {
@@ -80,7 +86,7 @@ public class DAOComputer {
 	public int getNbComputers() {
 		int nbComputers = 0;
 		String request = "select count(id) from computer;";
-		try (Connection connection = CDBConnection.getConnection();
+		try (Connection connection = cdbConnection.getConnection();
 				Statement statement = connection.createStatement();
 				ResultSet resultSet = statement.executeQuery(request)) {
 			if (resultSet.next()) {
@@ -102,7 +108,7 @@ public class DAOComputer {
 		List<Computer> computers = new ArrayList<>();
 		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 				+ "company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id limit ?,?;";
-		try (Connection con = CDBConnection.getConnection();
+		try (Connection con = cdbConnection.getConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(request)) {
 			preparedStatement.setInt(1, page.getNbRowsJumped());
 			preparedStatement.setInt(2, Page.getNbRowsReturned());
@@ -130,7 +136,7 @@ public class DAOComputer {
 		Computer computer = null;
 		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 				+ "company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id where computer.id = ?;";
-		try (Connection connection = CDBConnection.getConnection();
+		try (Connection connection = cdbConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setLong(1, computerId);
 			try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -148,7 +154,7 @@ public class DAOComputer {
 
 	public void createComputer(Computer computer) {
 		String request = "insert into computer(name, introduced, discontinued, company_id) values(?, ?, ?, ?);";
-		try (Connection connection = CDBConnection.getConnection();
+		try (Connection connection = cdbConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, computer.getName());
 			if (computer.getIntroduced() == null) {
@@ -174,7 +180,7 @@ public class DAOComputer {
 
 	public void updateComputer(Computer computer) {
 		String request = "update computer set name=?, introduced=?, discontinued=?, company_id=? where id=?;";
-		try (Connection connection = CDBConnection.getConnection();
+		try (Connection connection = cdbConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setString(1, computer.getName());
 			if (computer.getIntroduced() == null) {
@@ -201,7 +207,7 @@ public class DAOComputer {
 
 	public void deleteComputerById(long computerId) {
 		String request = "delete from computer where id=?;";
-		try (Connection connection = CDBConnection.getConnection();
+		try (Connection connection = cdbConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(request)) {
 			preparedStatement.setLong(1, computerId);
 			preparedStatement.executeUpdate();
@@ -210,26 +216,26 @@ public class DAOComputer {
 		}
 	}
 
-	public void findComputersPageSearchOrderBy(Page<Computer> page, String search, OrderBy orderBy) {
+	public void findComputersPageSearchOrderBy(Page<Computer> page) {
 		String request = null;
-		if (search != null && !search.equals("")) {
-			if (orderBy != null) {
-				request = String.format(COMPUTERS_LIMIT_LIKE_ORDER, orderMatch(orderBy));
+		if (page.getSearch() != null && !"".equals(page.getSearch())) {
+			if (page.getOrderBy() != null) {
+				request = String.format(COMPUTERS_LIMIT_LIKE_ORDER, orderMatch(page.getOrderBy()));
 
 			} else {
 				request = COMPUTERS_LIMIT_LIKE;
 			}
 		} else {
-			if (orderBy != null) {
-				request = String.format(COMPUTERS_LIMIT_ORDER, orderMatch(orderBy));
+			if (page.getOrderBy() != null) {
+				request = String.format(COMPUTERS_LIMIT_ORDER, orderMatch(page.getOrderBy()));
 			} else {
 				request = COMPUTERS_LIMIT;
 			}
 		}
 		List<Computer> computers = new ArrayList<>();
-		try (Connection con = CDBConnection.getConnection();
+		try (Connection con = cdbConnection.getConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(request)) {
-			fulfillPreparedStatement(preparedStatement, search, orderBy, page);
+			fulfillPreparedStatement(preparedStatement, page);
 			try (ResultSet rs = preparedStatement.executeQuery()) {
 				while (rs.next()) {
 					Computer computer = ComputerMapper.mapSQLToComputer(rs);
@@ -241,16 +247,16 @@ public class DAOComputer {
 		}
 		page.setEntities(computers);
 		String request2 = null;
-		if (search != null && !search.equals("")) {
+		if (page.getSearch() != null && !"".equals(page.getSearch())) {
 			request2 = COMPUTERS_LIKE;
 		} else {
 			request2 = COMPUTERS;
 		}
-		try (Connection con = CDBConnection.getConnection();
+		try (Connection con = cdbConnection.getConnection();
 				PreparedStatement preparedStatement = con.prepareStatement(request2)) {
-			if (search != null && !search.equals("")) {
-				preparedStatement.setString(1, '%' + search + '%');
-				preparedStatement.setString(2, '%' + search + '%');
+			if (page.getSearch() != null && !"".equals(page.getSearch())) {
+				preparedStatement.setString(1, '%' + page.getSearch() + '%');
+				preparedStatement.setString(2, '%' + page.getSearch() + '%');
 			}
 			try (ResultSet rs = preparedStatement.executeQuery()) {
 				if (rs.next()) {
@@ -262,11 +268,11 @@ public class DAOComputer {
 		}
 	}
 
-	private void fulfillPreparedStatement(PreparedStatement preparedStatement, String search, OrderBy orderBy,
-			Page<Computer> page) throws SQLException {
-		if (search != null && !search.equals("")) {
-			preparedStatement.setString(1, '%' + search + '%');
-			preparedStatement.setString(2, '%' + search + '%');
+	private void fulfillPreparedStatement(PreparedStatement preparedStatement, Page<Computer> page)
+			throws SQLException {
+		if (page.getSearch() != null && !"".equals(page.getSearch())) {
+			preparedStatement.setString(1, '%' + page.getSearch() + '%');
+			preparedStatement.setString(2, '%' + page.getSearch() + '%');
 			preparedStatement.setInt(3, page.getNbRowsJumped());
 			preparedStatement.setInt(4, Page.getNbRowsReturned());
 		} else {

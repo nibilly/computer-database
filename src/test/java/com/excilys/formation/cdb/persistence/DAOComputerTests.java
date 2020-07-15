@@ -1,83 +1,114 @@
 package com.excilys.formation.cdb.persistence;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Properties;
 
-import org.junit.jupiter.api.Test;
+import org.dbunit.DBTestCase;
+import org.dbunit.PropertiesBasedJdbcDatabaseTester;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.dbunit.operation.DatabaseOperation;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.Page;
+import com.excilys.formation.cdb.servlet.ContextFactory;
+import com.zaxxer.hikari.HikariDataSource;
 
-class DAOComputerTests {
-	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+public class DAOComputerTests extends DBTestCase {
 
-	private DAOComputer daoComputer = new DAOComputer();
+	private DAOComputer daoComputer;
 
-	@Test
-	void findAll() {
-		List<Computer> computers = daoComputer.findAll();
-		assertEquals(false, computers.isEmpty());
+	private CDBConnection cdbConnection;
+
+	public DAOComputerTests(String name) {
+		super(name);
+
+		try {
+			InputStream inputStream = new FileInputStream("src/test/resources/local.properties");
+			Properties properties = new Properties();
+			properties.load(inputStream);
+
+			String url = properties.getProperty("db.url");
+			String username = properties.getProperty("db.username");
+			String password = properties.getProperty("db.password");
+			String driver = properties.getProperty("db.driver");
+
+			System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_DRIVER_CLASS, driver);
+			System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_CONNECTION_URL, url);
+			System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_USERNAME, username);
+			System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_PASSWORD, password);
+			inputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		daoComputer = (DAOComputer) ContextFactory.getApplicationContext().getBean("daoComputer");
+		cdbConnection = (CDBConnection) ContextFactory.getApplicationContext().getBean("cdbConnection");
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		try (Connection connection = (Connection) ((HikariDataSource) ContextFactory.getApplicationContext()
+				.getBean("dataSource")).getConnection()) {
+			DatabaseConnection dbConnection = new DatabaseConnection(connection);
+			getSetUpOperation().execute(dbConnection, getDataSet());
+		}
+	}
+
+	@Override
+	protected DatabaseOperation getSetUpOperation() throws Exception {
+		return DatabaseOperation.CLEAN_INSERT;
+	}
+
+	@Override
+	protected IDataSet getDataSet() throws Exception {
+		return new FlatXmlDataSetBuilder().build(new FileInputStream("src/test/resources/dataset.xml"));
 	}
 
 	@Test
-	void getNbComputers() {
-		List<Computer> computers = daoComputer.findAll();
-		int nbComputers = daoComputer.getNbComputers();
-		assertEquals(computers.size(), nbComputers);
-	}
-
-	@Test
-	void findComputersPages() {
-		List<Computer> computers = daoComputer.findAll();
+	public void testFindComputersPages() {
 		Page<Computer> page = new Page<Computer>(1, 1);
 		daoComputer.findComputersPages(page);
-		assertEquals(computers.size() - 1, page.getEntities().size());
-		List<Computer> computersTest = new ArrayList<Computer>();
-		for (int i = 1; i < computers.size(); i++) {
-			computersTest.add(computers.get(i));
-		}
-		assertTrue(page.getEntities().containsAll(computersTest));
+		assertEquals(3, page.getEntities().size());
 	}
 
 	@Test
-	void findById() {
-		List<Computer> computers = daoComputer.findAll();
+	public void testFindById() {
 		try {
-			Computer computer = daoComputer.findById(computers.get(0).getId());
-			assertEquals(computers.get(0), computer);
+			Computer computer = daoComputer.findById(1);
+			assertEquals("un", computer.getName());
 		} catch (NoResultException e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	void createComputer() {
-		List<Computer> computers = daoComputer.findAll();
-		Computer computerTest = new Computer(computers.get(0));
-		assertFalse(computerTest == computers.get(0));
-		daoComputer.createComputer(computers.get(0));
+	public void testCreateComputer() {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE;
+		Computer computer = new Computer("name", LocalDate.parse("1999-01-01", dateTimeFormatter),
+				LocalDate.parse("1999-01-02", dateTimeFormatter), 2);
+		daoComputer.createComputer(computer);
 		String query = "SELECT computer.id, computer.name computer_name, computer.introduced, computer.discontinued,"
 				+ " company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id ORDER BY computer.id DESC LIMIT 1";
-		try (Connection connection = CDBConnection.getConnection();
+		try (Connection connection = cdbConnection.getConnection();
 				Statement statement = connection.createStatement();
 				ResultSet resultSet = statement.executeQuery(query)) {
 			if (resultSet.next()) {
-				Computer computer = ComputerMapper.mapSQLToComputer(resultSet);
-				computerTest.setId(computer.getId());
-				assertEquals(computer, computerTest);
-				computers.add(computer);
+				Computer computer1 = ComputerMapper.mapSQLToComputer(resultSet);
+				computer.setId(computer1.getId());
+				assertEquals(computer, computer1);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -85,27 +116,24 @@ class DAOComputerTests {
 	}
 
 	@Test
-	void updateComputer() {
-		List<Computer> computers = daoComputer.findAll();
-		Computer computer = computers.get(0);
-		computer.setIntroduced(LocalDate.parse("1998-01-01", dateTimeFormatter));
-		daoComputer.updateComputer(computer);
+	public void testUpdateComputer() {
 		try {
-			Computer computerBD = daoComputer.findById(computer.getId());
-			assertEquals(computer, computerBD);
+			Computer computer = daoComputer.findById(1);
+			computer.setDiscontinued(LocalDate.parse("2020-12-12"));
+			daoComputer.updateComputer(computer);
+			Computer computer1 = daoComputer.findById(1);
+			assertEquals(computer, computer1);
 		} catch (NoResultException e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	void deleteComputerById() {
-		List<Computer> computers = daoComputer.findAll();
+	public void testDeleteComputerById() {
 		boolean isSuppresed = false;
-		Computer computer = computers.get(0);
-		daoComputer.deleteComputerById(computer.getId());
+		daoComputer.deleteComputerById(1);
 		try {
-			daoComputer.findById(computer.getId());
+			daoComputer.findById(1);
 		} catch (NoResultException e) {
 			isSuppresed = true;
 		}

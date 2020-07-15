@@ -7,7 +7,6 @@ import java.util.Scanner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.model.Company;
@@ -15,6 +14,7 @@ import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.service.CompanyService;
 import com.excilys.formation.cdb.service.ComputerService;
+import com.excilys.formation.cdb.servlet.ContextFactory;
 
 /**
  * Command Line Interface
@@ -29,9 +29,9 @@ public class CLI {
 	private static boolean continuerMenu;
 	private static boolean continuerPageRequest;
 
-	private static ComputerService computerService = (ComputerService) new ClassPathXmlApplicationContext("beans.xml")
+	private static ComputerService computerService = (ComputerService) ContextFactory.getApplicationContext()
 			.getBean("computerService");
-	private static CompanyService companyService = (CompanyService) new ClassPathXmlApplicationContext("beans.xml")
+	private static CompanyService companyService = (CompanyService) ContextFactory.getApplicationContext()
 			.getBean("companyService");
 
 	/**

@@ -1,21 +1,21 @@
 package com.excilys.formation.cdb.dto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class CompanyDTOTest {
 	@Test
-	void companyDTOContructorFull() {
+	public void companyDTOContructorFull() {
 		String id = "1";
 		String name = "name";
 		CompanyDTO companyDTO = new CompanyDTO(id, name);
 		assertEquals(id, companyDTO.getId());
 		assertEquals(name, companyDTO.getName());
 	}
-	
+
 	@Test
-	void companyDTOContructorEmpty() {
+	public void companyDTOContructorEmpty() {
 		String id = "1";
 		String name = "name";
 		CompanyDTO companyDTO = new CompanyDTO();

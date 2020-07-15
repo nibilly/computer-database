@@ -1,15 +1,11 @@
 package com.excilys.formation.cdb.persistence;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 /**
@@ -23,30 +19,14 @@ public class CDBConnection {
 	/**
 	 * JDBC connection which is Autocloseable
 	 */
-	private static Connection connection;
+	private Connection connection;
 
 	private static Logger logger = LoggerFactory.getLogger(Connection.class);
 
-	private static HikariConfig config = new HikariConfig();
-	private static HikariDataSource ds;
+	private HikariDataSource dataSource;
 
-	static {
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
-		}
-		InputStream inputStream = CDBConnection.class.getClassLoader().getResourceAsStream("local.properties");
-		Properties properties = new Properties();
-		try {
-			properties.load(inputStream);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		config.setJdbcUrl(properties.getProperty("db.url"));
-		config.setUsername(properties.getProperty("db.username"));
-		config.setPassword(properties.getProperty("db.password"));
-		ds = new HikariDataSource(config);
+	public void setDataSource(HikariDataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 
 	/**
@@ -54,11 +34,11 @@ public class CDBConnection {
 	 * 
 	 * @return
 	 */
-	public synchronized static Connection getConnection() {
+	public synchronized Connection getConnection() {
 		logger.info("GetConnection()");
 		try {
 			if (connection == null || connection.isClosed()) {
-				connection = ds.getConnection();
+				connection = dataSource.getConnection();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

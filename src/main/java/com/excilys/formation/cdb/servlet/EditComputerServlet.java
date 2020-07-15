@@ -10,9 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import com.excilys.formation.cdb.dto.CompanyDTO;
+import com.excilys.formation.cdb.dto.ComputerDTO;
 import com.excilys.formation.cdb.mapper.CompanyMapper;
 import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
@@ -26,10 +25,14 @@ public class EditComputerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private ComputerService computerService = (ComputerService) new ClassPathXmlApplicationContext("beans.xml")
-			.getBean("computerService");
-	private CompanyService companyService = (CompanyService) new ClassPathXmlApplicationContext("beans.xml")
-			.getBean("companyService");
+	private ComputerService computerService;
+
+	private CompanyService companyService;
+
+	public EditComputerServlet() {
+		computerService = (ComputerService) ContextFactory.getApplicationContext().getBean("computerService");
+		companyService = (CompanyService) ContextFactory.getApplicationContext().getBean("companyService");
+	}
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -56,8 +59,9 @@ public class EditComputerServlet extends HttpServlet {
 		String introduced = request.getParameter("introduced");
 		String discontinued = request.getParameter("discontinued");
 		String companyId = request.getParameter("company");
+		ComputerDTO computerDTO = new ComputerDTO(id, name, introduced, discontinued, companyId, null);
 		Computer computer = new Computer();
-		Validation validation = ComputerValidation.validation(id, name, introduced, discontinued, companyId, computer);
+		Validation validation = ComputerValidation.editValidation(computerDTO, computer);
 		if (validation != Validation.NO_ERROR) {
 			request.setAttribute("error", validation);
 		} else {
