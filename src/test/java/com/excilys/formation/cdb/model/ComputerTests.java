@@ -9,7 +9,7 @@ import org.junit.Test;
 public class ComputerTests {
 
 	@Test
-	public void constructorFull() {
+	public void testConstructorFull() {
 		LocalDate localDate = LocalDate.now();
 		LocalDate localDate1 = LocalDate.now().plusDays(1);
 		Computer computer = new Computer(1, "name", localDate, localDate1, 1, "companyName");
@@ -22,7 +22,7 @@ public class ComputerTests {
 	}
 
 	@Test
-	public void setters() {
+	public void testSetters() {
 		LocalDate localDate = LocalDate.now();
 		LocalDate localDate1 = LocalDate.now().plusDays(1);
 		Computer computer = new Computer();

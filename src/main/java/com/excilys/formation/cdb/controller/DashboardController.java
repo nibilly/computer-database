@@ -1,15 +1,12 @@
+package com.excilys.formation.cdb.controller;
 
-package com.excilys.formation.cdb.servlet;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.dto.ComputerDTO;
@@ -19,32 +16,29 @@ import com.excilys.formation.cdb.model.OrderBy;
 import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.service.ComputerService;
 
-// @WebServlet(urlPatterns = "/dashboard")
-public class DashboardServlet extends HttpServlet {
-
-	private static final long serialVersionUID = 1L;
+@Controller
+@RequestMapping("/dashboard")
+public class DashboardController {
 
 	private ComputerService computerService;
 
-	public DashboardServlet() {
+	public DashboardController() {
 		computerService = (ComputerService) ContextFactory.getApplicationContext().getBean("computerService");
 	}
 
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html");
-		response.setCharacterEncoding("UTF-8");
+	@RequestMapping(method = RequestMethod.GET)
+	public String getDashboard(ModelMap model) {
 		try {
-			int nbRowsReturned = Integer.parseInt(request.getParameter("nbRowsReturned"));
-			Page.setNbRowsReturned(nbRowsReturned);
+			int nbRowsReturned1 = Integer.parseInt("10");
+			Page.setNbRowsReturned(nbRowsReturned1);
 		} catch (NumberFormatException e) {
 		}
 		Page<ComputerDTO> page = new Page<ComputerDTO>(1, 0);
-		String search = request.getParameter("search");
-		request.setAttribute("search", search);
+		String search = null; // request.getParameter("search");
+		model.addAttribute("search", search);
 		page.setSearch(search);
-		String orderByString = request.getParameter("orderBy");
-		request.setAttribute("orderBy", orderByString);
+		String orderByString = null; // request.getParameter("orderBy");
+		model.addAttribute("orderBy", orderByString);
 		OrderBy orderBy = null;
 		if (orderByString != null) {
 			switch (orderByString) {
@@ -67,23 +61,23 @@ public class DashboardServlet extends HttpServlet {
 		}
 		page.setOrderBy(orderBy);
 
-		listComputers(request, response, page);
-		request.setAttribute("page", page);
+		listComputers(model, page);
+		model.addAttribute("page", page);
 		int nbComputers = page.getNbComputerFound();
-		request.setAttribute("nbComputers", nbComputers + "");
+		model.addAttribute("nbComputers", nbComputers + "");
 		int nbPages = (nbComputers == 0) ? 1 : nbComputers / Page.getNbRowsReturned();
 		if ((nbComputers % Page.getNbRowsReturned()) > 0) {
 			nbPages++;
 		}
-		request.setAttribute("nbPages", nbPages);
+		model.addAttribute("nbPages", nbPages);
 
-		this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
+		return "dashboard";
 	}
 
-	private void listComputers(HttpServletRequest request, HttpServletResponse response, Page<ComputerDTO> pageDTO) {
+	private void listComputers(ModelMap model, Page<ComputerDTO> pageDTO) {
 		int pageRequested;
 		try {
-			pageRequested = Integer.parseInt(request.getParameter("page"));
+			pageRequested = Integer.parseInt("1"); // request.getParameter("page"));
 		} catch (NumberFormatException e) {
 			pageRequested = 1;
 		}
@@ -101,21 +95,4 @@ public class DashboardServlet extends HttpServlet {
 		pageDTO.setEntities(computersDTO);
 		pageDTO.setNbComputerFound(page.getNbComputerFound());
 	}
-
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		String selection = request.getParameter("selection");
-		List<String> selections = Arrays.asList(selection.split(","));
-		for (String string : selections) {
-			try {
-				long id = Long.parseLong(string);
-				computerService.deleteComputerById(id);
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			}
-		}
-		this.doGet(request, response);
-	}
-
 }

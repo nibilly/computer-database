@@ -6,14 +6,14 @@ import org.junit.Test;
 
 public class CompanyTests {
 	@Test
-	public void constructorFull() {
+	public void testConstructorFull() {
 		Company company = new Company(1, "name");
 		assertEquals(1, company.getId());
 		assertEquals("name", company.getName());
 	}
 
 	@Test
-	public void setters() {
+	public void testSetters() {
 		Company company = new Company();
 		company.setId(1);
 		company.setName("name");

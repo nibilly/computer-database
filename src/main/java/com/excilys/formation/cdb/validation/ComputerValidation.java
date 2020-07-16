@@ -3,13 +3,13 @@ package com.excilys.formation.cdb.validation;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.dto.ComputerDTO;
 import com.excilys.formation.cdb.mapper.DateMapper;
 import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.service.CompanyService;
 import com.excilys.formation.cdb.service.ComputerService;
-import com.excilys.formation.cdb.servlet.ContextFactory;
 
 public class ComputerValidation {
 	private static ComputerService computerService = (ComputerService) ContextFactory.getApplicationContext()

@@ -2,8 +2,8 @@ package com.excilys.formation.cdb.model;
 
 import java.time.LocalDate;
 
+import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.service.CompanyService;
-import com.excilys.formation.cdb.servlet.ContextFactory;
 
 /**
  * A computer products by a Company

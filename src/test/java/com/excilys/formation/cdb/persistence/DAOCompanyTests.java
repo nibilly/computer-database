@@ -16,10 +16,10 @@ import org.dbunit.operation.DatabaseOperation;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Page;
-import com.excilys.formation.cdb.servlet.ContextFactory;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class DAOCompanyTests extends DBTestCase {
@@ -84,6 +84,17 @@ public class DAOCompanyTests extends DBTestCase {
 		} catch (NoResultException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Test
+	public void testFindByIdNoResult() {
+		boolean noResult = false;
+		try {
+			daoCompany.findById(80);
+		} catch (NoResultException e) {
+			noResult = true;
+		}
+		assertTrue(noResult);
 	}
 
 	@Test

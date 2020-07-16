@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 import org.junit.Test;
 
-import com.excilys.formation.cdb.servlet.ContextFactory;
+import com.excilys.formation.cdb.config.ContextFactory;
 
 public class CDBConnectionTests {
 
@@ -19,7 +19,7 @@ public class CDBConnectionTests {
 	}
 
 	@Test
-	public void connectionClosed() {
+	public void testConnectionClosed() {
 
 		int hashCode = 0;
 		int hashCode1 = 1;
@@ -43,7 +43,7 @@ public class CDBConnectionTests {
 	}
 
 	@Test
-	public void connectionSingleton() {
+	public void testConnectionSingleton() {
 		int hashCode = 0;
 		int hashCode1 = 1;
 		try (Connection c = cdbConnection.getConnection()) {

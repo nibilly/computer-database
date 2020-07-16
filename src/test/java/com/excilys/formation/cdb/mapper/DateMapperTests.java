@@ -12,7 +12,7 @@ import org.junit.Test;
 public class DateMapperTests {
 	@Test
 	@SuppressWarnings("deprecation")
-	public void equality() {
+	public void testEquality() {
 		long now = System.currentTimeMillis();
 		Date date = new Date(now);
 		LocalDate localDate = Instant.ofEpochMilli(now).atZone(ZoneId.systemDefault()).toLocalDate();

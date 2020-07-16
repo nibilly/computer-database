@@ -21,7 +21,7 @@ public class CompanyMapperTests {
 	}
 
 	@Test
-	public void mapSQLToCompany() {
+	public void testMapSQLToCompany() {
 		ResultSet resultSet = Mockito.mock(ResultSet.class);
 		Company companyTest = new Company(2, "name");
 		Company company = null;
@@ -40,7 +40,7 @@ public class CompanyMapperTests {
 	}
 
 	@Test
-	public void mapCompanyDTO() {
+	public void testMapCompanyDTO() {
 		long id = 1L;
 		String name = "name";
 		Company company = new Company(id, name);

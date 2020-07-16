@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Properties;
 
 import org.dbunit.DBTestCase;
@@ -20,11 +21,11 @@ import org.dbunit.operation.DatabaseOperation;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.Page;
-import com.excilys.formation.cdb.servlet.ContextFactory;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class DAOComputerTests extends DBTestCase {
@@ -78,6 +79,18 @@ public class DAOComputerTests extends DBTestCase {
 	}
 
 	@Test
+	public void testFindAll() {
+		List<Computer> computers = daoComputer.findAll();
+		assertFalse(computers.isEmpty());
+	}
+
+	@Test
+	public void testGetNbComputers() {
+		int nb = daoComputer.getNbComputers();
+		assertEquals(4, nb);
+	}
+
+	@Test
 	public void testFindComputersPages() {
 		Page<Computer> page = new Page<Computer>(1, 1);
 		daoComputer.findComputersPages(page);
@@ -88,7 +101,12 @@ public class DAOComputerTests extends DBTestCase {
 	public void testFindById() {
 		try {
 			Computer computer = daoComputer.findById(1);
+			assertEquals(1, computer.getId());
 			assertEquals("un", computer.getName());
+			assertEquals("1999-01-01", computer.getIntroduced().toString());
+			assertEquals("2000-12-31", computer.getDiscontinued().toString());
+			assertEquals(1, computer.getCompany().getId());
+			assertEquals("Apple Inc.", computer.getCompany().getName());
 		} catch (NoResultException e) {
 			e.printStackTrace();
 		}

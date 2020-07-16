@@ -1,3 +1,4 @@
+
 package com.excilys.formation.cdb.servlet;
 
 import java.io.IOException;
@@ -5,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.dto.CompanyDTO;
 import com.excilys.formation.cdb.dto.ComputerDTO;
 import com.excilys.formation.cdb.mapper.CompanyMapper;
@@ -20,7 +21,7 @@ import com.excilys.formation.cdb.service.ComputerService;
 import com.excilys.formation.cdb.validation.ComputerValidation;
 import com.excilys.formation.cdb.validation.Validation;
 
-@WebServlet(urlPatterns = "/editComputer")
+// @WebServlet(urlPatterns = "/editComputer")
 public class EditComputerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;

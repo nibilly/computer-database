@@ -6,7 +6,7 @@ import org.junit.Test;
 
 public class CompanyDTOTest {
 	@Test
-	public void companyDTOContructorFull() {
+	public void testCompanyDTOContructorFull() {
 		String id = "1";
 		String name = "name";
 		CompanyDTO companyDTO = new CompanyDTO(id, name);
@@ -15,7 +15,7 @@ public class CompanyDTOTest {
 	}
 
 	@Test
-	public void companyDTOContructorEmpty() {
+	public void testCompanyDTOContructorEmpty() {
 		String id = "1";
 		String name = "name";
 		CompanyDTO companyDTO = new CompanyDTO();

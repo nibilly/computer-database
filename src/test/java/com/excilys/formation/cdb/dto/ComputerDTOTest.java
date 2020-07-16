@@ -7,7 +7,7 @@ import org.junit.Test;
 public class ComputerDTOTest {
 
 	@Test
-	public void computerDTOComstructorFull() {
+	public void testComputerDTOComstructorFull() {
 		String id = "1";
 		String name = "name";
 		String introduced = "1991-01-01";
@@ -24,7 +24,7 @@ public class ComputerDTOTest {
 	}
 
 	@Test
-	public void computerDTOComstructorEmpty() {
+	public void testComputerDTOComstructorEmpty() {
 		String id = "1";
 		String name = "name";
 		String introduced = "1991-01-01";

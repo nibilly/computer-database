@@ -9,8 +9,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import org.dbunit.DBTestCase;
@@ -22,12 +20,12 @@ import org.dbunit.operation.DatabaseOperation;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.persistence.CDBConnection;
-import com.excilys.formation.cdb.servlet.ContextFactory;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class ComputerServiceTests extends DBTestCase {
@@ -92,7 +90,6 @@ public class ComputerServiceTests extends DBTestCase {
 		Page<Computer> page = new Page<Computer>(1, 1);
 		computerService.findComputersPages(page);
 		assertEquals(3, page.getEntities().size());
-		List<Computer> computersTest = new ArrayList<Computer>();
 		Computer computer = page.getEntities().get(0);
 		assertEquals(2, computer.getId());
 		assertEquals("CM-2a", computer.getName());

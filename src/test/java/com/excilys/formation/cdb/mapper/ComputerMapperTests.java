@@ -24,7 +24,7 @@ public class ComputerMapperTests {
 	}
 
 	@Test
-	public void mapSQLTocomputer() {
+	public void testMapSQLTocomputer() {
 		ResultSet resultSet = Mockito.mock(ResultSet.class);
 		Computer computerTest = new Computer(2, "name", LocalDate.parse("1998-01-01", dateTimeFormatter),
 				LocalDate.parse("2003-01-01", dateTimeFormatter), 2, "CompanyName");
@@ -51,7 +51,7 @@ public class ComputerMapperTests {
 	}
 
 	@Test
-	public void mapComputerDTO() {
+	public void testMapComputerDTO() {
 		long id = 1L;
 		String name = "name";
 		LocalDate introduced = LocalDate.parse("1995-01-01", dateTimeFormatter);

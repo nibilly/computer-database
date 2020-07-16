@@ -29,7 +29,7 @@ public class PageTests {
 	};
 
 	@Test
-	public void constructorComputerFull() {
+	public void testConstructorComputerFull() {
 		Page<Computer> page = new Page<Computer>(1, 10);
 		page.setEntities(computers);
 		assertEquals(1, page.getPageNumber());
@@ -39,7 +39,7 @@ public class PageTests {
 	}
 
 	@Test
-	public void settersComputer() {
+	public void testSettersComputer() {
 		Page<Computer> page = new Page<Computer>();
 		page.setNbRowsJumped(10);
 		page.setPageNumber(1);
@@ -51,7 +51,7 @@ public class PageTests {
 	}
 
 	@Test
-	public void constructorCompanyFull() {
+	public void testConstructorCompanyFull() {
 		Page<Company> page = new Page<Company>(1, 10);
 		page.setEntities(companies);
 		assertEquals(1, page.getPageNumber());
@@ -61,7 +61,7 @@ public class PageTests {
 	}
 
 	@Test
-	public void settersCompany() {
+	public void testSettersCompany() {
 		Page<Company> page = new Page<Company>();
 		page.setNbRowsJumped(10);
 		page.setPageNumber(1);
@@ -73,14 +73,14 @@ public class PageTests {
 	}
 
 	@Test
-	public void search() {
+	public void testSearch() {
 		Page<Computer> page = new Page<Computer>();
 		page.setSearch("computer");
 		assertEquals("computer", page.getSearch());
 	}
 
 	@Test
-	public void orderBy() {
+	public void testOrderBy() {
 		Page<Computer> page = new Page<Computer>();
 		page.setOrderBy(OrderBy.COMPANY_NAME);
 		assertEquals(OrderBy.COMPANY_NAME, page.getOrderBy());

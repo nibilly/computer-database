@@ -16,10 +16,10 @@ import org.dbunit.operation.DatabaseOperation;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.Page;
-import com.excilys.formation.cdb.servlet.ContextFactory;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class CompanyServiceTests extends DBTestCase {
