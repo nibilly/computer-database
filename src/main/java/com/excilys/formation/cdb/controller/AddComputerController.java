@@ -1,14 +1,13 @@
+package com.excilys.formation.cdb.controller;
 
-package com.excilys.formation.cdb.servlet;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.dto.CompanyDTO;
@@ -21,47 +20,39 @@ import com.excilys.formation.cdb.service.ComputerService;
 import com.excilys.formation.cdb.validation.ComputerValidation;
 import com.excilys.formation.cdb.validation.Validation;
 
-// @WebServlet(urlPatterns = "/add-computer")
-public class AddComputerServlet extends HttpServlet {
-
-	private static final long serialVersionUID = 1L;
+@Controller
+@RequestMapping("/add-computer")
+public class AddComputerController {
 
 	private ComputerService computerService;
 
 	private CompanyService companyService;
 
-	public AddComputerServlet() {
+	public AddComputerController() {
 		computerService = (ComputerService) ContextFactory.getApplicationContext().getBean("computerService");
 		companyService = (CompanyService) ContextFactory.getApplicationContext().getBean("companyService");
 	}
 
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	@RequestMapping(method = RequestMethod.GET)
+	public String displayAdd(ModelMap model) {
 		List<Company> companies = companyService.findAll();
 		List<CompanyDTO> companiesDTO = new ArrayList<CompanyDTO>();
 		for (Company company : companies) {
 			companiesDTO.add(CompanyMapper.mapCompanyDTO(company));
 		}
-		request.setAttribute("companies", companiesDTO);
-		this.getServletContext().getRequestDispatcher("/views/addComputer.jsp").forward(request, response);
+		model.addAttribute("companies", companiesDTO);
+		return "addComputer";
 	}
 
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		String name = request.getParameter("name");
-		String introduced = request.getParameter("introduced");
-		String discontinued = request.getParameter("discontinued");
-		String companyId = request.getParameter("company");
+	@RequestMapping(method = RequestMethod.POST)
+	public RedirectView createComputer(ComputerDTO computerDTO, ModelMap model) {
 		Computer computer = new Computer();
-		ComputerDTO computerDTO = new ComputerDTO(null, name, introduced, discontinued, companyId, null);
 		Validation validation = ComputerValidation.validation(computerDTO, computer);
 		if (validation != Validation.NO_ERROR) {
-			request.setAttribute("error", validation);
+			model.addAttribute("error", validation);
 		} else {
 			computerService.createComputer(computer);
 		}
-		doGet(request, response);
+		return new RedirectView("dashboard");
 	}
 }

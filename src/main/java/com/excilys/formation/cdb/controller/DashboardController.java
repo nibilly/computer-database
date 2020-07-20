@@ -1,15 +1,18 @@
 package com.excilys.formation.cdb.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.dto.ComputerDTO;
+import com.excilys.formation.cdb.dto.DashboardDTO;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.OrderBy;
@@ -27,17 +30,17 @@ public class DashboardController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String getDashboard(ModelMap model) {
+	public String getDashboard(DashboardDTO dashboardDTO, ModelMap model) {
 		try {
-			int nbRowsReturned1 = Integer.parseInt("10");
+			int nbRowsReturned1 = Integer.parseInt(dashboardDTO.getNbRowsReturned());
 			Page.setNbRowsReturned(nbRowsReturned1);
 		} catch (NumberFormatException e) {
 		}
 		Page<ComputerDTO> page = new Page<ComputerDTO>(1, 0);
-		String search = null; // request.getParameter("search");
+		String search = dashboardDTO.getSearch();
 		model.addAttribute("search", search);
 		page.setSearch(search);
-		String orderByString = null; // request.getParameter("orderBy");
+		String orderByString = dashboardDTO.getOrderBy();
 		model.addAttribute("orderBy", orderByString);
 		OrderBy orderBy = null;
 		if (orderByString != null) {
@@ -61,7 +64,7 @@ public class DashboardController {
 		}
 		page.setOrderBy(orderBy);
 
-		listComputers(model, page);
+		listComputers(model, page, dashboardDTO);
 		model.addAttribute("page", page);
 		int nbComputers = page.getNbComputerFound();
 		model.addAttribute("nbComputers", nbComputers + "");
@@ -74,10 +77,10 @@ public class DashboardController {
 		return "dashboard";
 	}
 
-	private void listComputers(ModelMap model, Page<ComputerDTO> pageDTO) {
+	private void listComputers(ModelMap model, Page<ComputerDTO> pageDTO, DashboardDTO dashboardDTO) {
 		int pageRequested;
 		try {
-			pageRequested = Integer.parseInt("1"); // request.getParameter("page"));
+			pageRequested = Integer.parseInt(dashboardDTO.getPage());
 		} catch (NumberFormatException e) {
 			pageRequested = 1;
 		}
@@ -94,5 +97,20 @@ public class DashboardController {
 		pageDTO.setNbRowsJumped(nbRowsJumped);
 		pageDTO.setEntities(computersDTO);
 		pageDTO.setNbComputerFound(page.getNbComputerFound());
+	}
+
+	@RequestMapping(method = RequestMethod.POST)
+	public void deleteDashboard(DashboardDTO dashboardDTO, @RequestParam("selection") String selection,
+			ModelMap model) {
+		List<String> selections = Arrays.asList(selection.split(","));
+		for (String string : selections) {
+			try {
+				long id = Long.parseLong(string);
+				computerService.deleteComputerById(id);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
+		getDashboard(dashboardDTO, model);
 	}
 }

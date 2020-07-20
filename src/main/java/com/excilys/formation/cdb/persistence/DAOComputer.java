@@ -33,7 +33,7 @@ public class DAOComputer {
 	private static final String COMPUTERS_LIMIT_LIKE_ORDER = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 			+ "company.id company_id, company.name company_name"
 			+ " from computer left join company on computer.company_id = company.id "
-			+ "where computer.name like :computer_name or company.name like company_name order by :order_by limit :jump,:return;";
+			+ "where computer.name like :computer_name or company.name like :company_name order by :order_by limit :jump,:return;";
 
 	private static final String COMPUTERS_LIMIT_LIKE = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
 			+ "company.id company_id, company.name company_name"
