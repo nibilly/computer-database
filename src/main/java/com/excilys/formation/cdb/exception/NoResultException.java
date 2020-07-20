@@ -8,7 +8,7 @@ package com.excilys.formation.cdb.exception;
  */
 public class NoResultException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	@Override
 	public String getMessage() {

@@ -11,7 +11,7 @@ import org.junit.Test;
 public class PageTests {
 
 	private final List<Computer> computers = new ArrayList<Computer>() {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 
 		{
 			add(new Computer(1, "name", LocalDate.now(), LocalDate.now().plusDays(1), 1, "companyName"));
@@ -20,7 +20,7 @@ public class PageTests {
 	};
 
 	private final List<Company> companies = new ArrayList<Company>() {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 
 		{
 			add(new Company(1, "companyName"));
