@@ -14,8 +14,8 @@ public class PageTests {
 		private static final long serialVersionUID = 2L;
 
 		{
-			add(new Computer(1, "name", LocalDate.now(), LocalDate.now().plusDays(1), 1, "companyName"));
-			add(new Computer(2, "name2", null, LocalDate.now().plusDays(1), 2, "companyName2"));
+			add(new Computer(1, "name", LocalDate.now(), LocalDate.now().plusDays(1), new Company(1, "companyName")));
+			add(new Computer(2, "name2", null, LocalDate.now().plusDays(1), new Company(2, "companyName2")));
 		}
 	};
 

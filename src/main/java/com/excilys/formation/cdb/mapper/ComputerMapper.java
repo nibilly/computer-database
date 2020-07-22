@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 import com.excilys.formation.cdb.dto.ComputerDTO;
+import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
 
 /**
@@ -28,7 +29,8 @@ public class ComputerMapper {
 		LocalDate discontinued = DateMapper.localDateFromSqlDate(resultSet.getDate("discontinued"));
 		long companyId = resultSet.getLong("company_id");
 		String companyName = resultSet.getString("company_name");
-		return new Computer(id, name, introduced, discontinued, companyId, companyName);
+		Company company = new Company(companyId, companyName);
+		return new Computer(id, name, introduced, discontinued, company);
 	}
 
 	public static ComputerDTO mapComputerDTO(Computer computer) {

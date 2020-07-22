@@ -100,6 +100,6 @@ public class CompanyServiceTests extends DBTestCase {
 		List<Company> companiesDeleted = companyService.findAll();
 		assertEquals(1, companiesDeleted.size());
 		List<Computer> computersDeleted = computerService.findAll();
-		assertFalse(computersDeleted.stream().anyMatch(c -> c.getCompany().getId() == 1));
+		assertEquals(3, computersDeleted.size());
 	}
 }

@@ -2,8 +2,14 @@ package com.excilys.formation.cdb.model;
 
 import java.time.LocalDate;
 
-import com.excilys.formation.cdb.config.ContextFactory;
-import com.excilys.formation.cdb.service.CompanyService;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * A computer products by a Company
@@ -11,29 +17,37 @@ import com.excilys.formation.cdb.service.CompanyService;
  * @author nbilly
  *
  */
+@Entity
+@Table(name = "computer")
 public class Computer {
-	private static CompanyService companyService = (CompanyService) ContextFactory.getApplicationContext()
-			.getBean("companyService");
 
 	/**
 	 * identification
 	 */
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private long id;
 	/**
 	 * complete name
 	 */
+	@Column(name = "name")
 	private String name;
 	/**
 	 * when this computer can be buy in market
 	 */
+	@Column(name = "introduced")
 	private LocalDate introduced;
 	/**
 	 * when this computer cannot be buy in market
 	 */
+	@Column(name = "discontinued")
 	private LocalDate discontinued;
 	/**
 	 * a computer is produced by a company
 	 */
+	@ManyToOne
+	@JoinColumn(name = "company_id")
 	private Company company;
 
 	public long getId() {
@@ -86,16 +100,14 @@ public class Computer {
 	 * @param name
 	 * @param introduced
 	 * @param discontinued
-	 * @param companyId
-	 * @param companyName
+	 * @param company
 	 */
-	public Computer(long id, String name, LocalDate introduced, LocalDate discontinued, long companyId,
-			String companyName) {
+	public Computer(long id, String name, LocalDate introduced, LocalDate discontinued, Company company) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
 		this.discontinued = discontinued;
-		this.company = new Company(companyId, companyName);
+		this.company = company;
 	}
 
 	/**
@@ -104,18 +116,13 @@ public class Computer {
 	 * @param name
 	 * @param introduced
 	 * @param discontinued
-	 * @param companyId
+	 * @param company
 	 */
-	public Computer(String name, LocalDate introduced, LocalDate discontinued, long companyId) {
+	public Computer(String name, LocalDate introduced, LocalDate discontinued, Company company) {
 		this.name = name;
 		this.introduced = introduced;
 		this.discontinued = discontinued;
-		this.company = companyService.findById(companyId);
-	}
-
-	public Computer(Computer other) {
-		this(other.getId(), other.getName(), other.getIntroduced(), other.getDiscontinued(), other.getCompany().getId(),
-				other.getCompany().getName());
+		this.company = company;
 	}
 
 	@Override

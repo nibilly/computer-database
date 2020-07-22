@@ -4,6 +4,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Properties;
 
@@ -25,6 +28,8 @@ import com.zaxxer.hikari.HikariDataSource;
 public class DAOCompanyTests extends DBTestCase {
 
 	private DAOCompany daoCompany;
+
+	private CDBConnection cdbConnection;
 
 	public DAOCompanyTests(String name) {
 		super(name);
@@ -48,6 +53,7 @@ public class DAOCompanyTests extends DBTestCase {
 			e.printStackTrace();
 		}
 		daoCompany = (DAOCompany) ContextFactory.getApplicationContext().getBean("daoCompany");
+		cdbConnection = (CDBConnection) ContextFactory.getApplicationContext().getBean("cdbConnection");
 	}
 
 	@Before
@@ -111,5 +117,40 @@ public class DAOCompanyTests extends DBTestCase {
 		Company company = page.getEntities().get(0);
 		assertEquals(2, company.getId());
 		assertEquals("Thinking Machines", company.getName());
+	}
+
+	@Test
+	public void testDelete() {
+		boolean isSuppressed = true;
+		daoCompany.delete(1);
+		String queryComputer = "SELECT count(id) from computer where company_id = 1;";
+		String queryCompany = "SELECT count(id) from company where id = 1;";
+		try (Connection connection = cdbConnection.getConnection();
+				Statement statement = connection.createStatement();
+				ResultSet resultSet = statement.executeQuery(queryComputer)) {
+			if (resultSet.next()) {
+				long nb = resultSet.getLong("count(id)");
+				if (nb > 0) {
+					isSuppressed = false;
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		if (isSuppressed) {
+			try (Connection connection = cdbConnection.getConnection();
+					Statement statement = connection.createStatement();
+					ResultSet resultSet = statement.executeQuery(queryCompany)) {
+				if (resultSet.next()) {
+					long nb = resultSet.getLong("count(id)");
+					if (nb > 0) {
+						isSuppressed = false;
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		assertTrue(isSuppressed);
 	}
 }

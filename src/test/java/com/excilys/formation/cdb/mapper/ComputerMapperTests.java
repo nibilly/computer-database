@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.excilys.formation.cdb.dto.ComputerDTO;
+import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
 
 public class ComputerMapperTests {
@@ -27,7 +28,7 @@ public class ComputerMapperTests {
 	public void testMapSQLTocomputer() {
 		ResultSet resultSet = Mockito.mock(ResultSet.class);
 		Computer computerTest = new Computer(2, "name", LocalDate.parse("1998-01-01", dateTimeFormatter),
-				LocalDate.parse("2003-01-01", dateTimeFormatter), 2, "CompanyName");
+				LocalDate.parse("2003-01-01", dateTimeFormatter), new Company(2, "CompanyName"));
 
 		Computer computer = null;
 		try {
@@ -58,7 +59,7 @@ public class ComputerMapperTests {
 		LocalDate discontinued = LocalDate.parse("1995-01-01", dateTimeFormatter);
 		long companyId = 2L;
 		String companyName = "companyName";
-		Computer computer = new Computer(id, name, introduced, discontinued, companyId, companyName);
+		Computer computer = new Computer(id, name, introduced, discontinued, new Company(companyId, companyName));
 		ComputerDTO computerDTO = ComputerMapper.mapComputerDTO(computer);
 		assertEquals(id + "", computerDTO.getId());
 		assertEquals(name, computerDTO.getName());

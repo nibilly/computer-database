@@ -24,6 +24,7 @@ import org.junit.Test;
 import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
+import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.Page;
 import com.zaxxer.hikari.HikariDataSource;
@@ -113,10 +114,21 @@ public class DAOComputerTests extends DBTestCase {
 	}
 
 	@Test
+	public void testFindByIdNoResult() {
+		boolean noResult = false;
+		try {
+			daoComputer.findById(80);
+		} catch (NoResultException e) {
+			noResult = true;
+		}
+		assertTrue(noResult);
+	}
+
+	@Test
 	public void testCreateComputer() {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE;
 		Computer computer = new Computer("name", LocalDate.parse("1999-01-01", dateTimeFormatter),
-				LocalDate.parse("1999-01-02", dateTimeFormatter), 2);
+				LocalDate.parse("1999-01-02", dateTimeFormatter), new Company(2, "Thinking Machines"));
 		daoComputer.createComputer(computer);
 		String query = "SELECT computer.id, computer.name computer_name, computer.introduced, computer.discontinued,"
 				+ " company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id ORDER BY computer.id DESC LIMIT 1";
@@ -125,6 +137,7 @@ public class DAOComputerTests extends DBTestCase {
 				ResultSet resultSet = statement.executeQuery(query)) {
 			if (resultSet.next()) {
 				Computer computer1 = ComputerMapper.mapSQLToComputer(resultSet);
+				assertTrue(computer1.getId() > 4);
 				computer.setId(computer1.getId());
 				assertEquals(computer, computer1);
 			}

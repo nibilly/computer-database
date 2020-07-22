@@ -23,6 +23,7 @@ import org.junit.Test;
 import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
+import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.Page;
 import com.excilys.formation.cdb.persistence.CDBConnection;
@@ -113,7 +114,7 @@ public class ComputerServiceTests extends DBTestCase {
 	public void testCreateComputer() {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE;
 		Computer computer = new Computer("name", LocalDate.parse("1980-05-04", dateTimeFormatter),
-				LocalDate.parse("2000-12-31", dateTimeFormatter), 2);
+				LocalDate.parse("2000-12-31", dateTimeFormatter), new Company(2, "Thinking Machines"));
 		computerService.createComputer(computer);
 		String query = "SELECT computer.id, computer.name computer_name, computer.introduced, computer.discontinued,"
 				+ " company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id ORDER BY computer.id DESC LIMIT 1";

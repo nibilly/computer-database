@@ -204,7 +204,8 @@ public class CLI {
 				}
 			}
 		} while (continuer);
-		return new Computer(name, introducedDate, discontinuedDate, companyIdLong);
+		Company company = companyService.findById(companyIdLong);
+		return new Computer(name, introducedDate, discontinuedDate, company);
 	}
 
 	/**

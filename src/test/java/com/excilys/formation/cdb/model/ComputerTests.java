@@ -12,7 +12,7 @@ public class ComputerTests {
 	public void testConstructorFull() {
 		LocalDate localDate = LocalDate.now();
 		LocalDate localDate1 = LocalDate.now().plusDays(1);
-		Computer computer = new Computer(1, "name", localDate, localDate1, 1, "companyName");
+		Computer computer = new Computer(1, "name", localDate, localDate1, new Company(1, "companyName"));
 		assertEquals(1, computer.getId());
 		assertEquals("name", computer.getName());
 		assertEquals(localDate, computer.getIntroduced());

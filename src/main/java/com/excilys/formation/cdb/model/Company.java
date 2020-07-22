@@ -1,19 +1,31 @@
 package com.excilys.formation.cdb.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * A company products Computers
  * 
  * @author nbilly
  *
  */
+@Entity
+@Table(name = "company")
 public class Company {
 	/**
 	 * identification
 	 */
+	@Id
+	@GeneratedValue
+	@Column(name = "id")
 	private long id;
 	/**
 	 * complete computer name
 	 */
+	@Column(name = "name")
 	private String name;
 
 	public long getId() {

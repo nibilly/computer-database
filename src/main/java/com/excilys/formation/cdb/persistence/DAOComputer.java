@@ -2,16 +2,19 @@ package com.excilys.formation.cdb.persistence;
 
 import java.util.List;
 
-import javax.sql.DataSource;
-
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
 
 import com.excilys.formation.cdb.exception.NoResultException;
-import com.excilys.formation.cdb.mapper.ComputerRowMapper;
-import com.excilys.formation.cdb.mapper.DateMapper;
+import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
 import com.excilys.formation.cdb.model.OrderBy;
 import com.excilys.formation.cdb.model.Page;
@@ -23,38 +26,11 @@ import com.excilys.formation.cdb.model.Page;
  *
  */
 public class DAOComputer {
+	private EntityManager entityManager;
 
-	private DataSource dataSource;
-
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
+	public void setEntityManager(EntityManager entityManager) {
+		this.entityManager = entityManager;
 	}
-
-	private static final String COMPUTERS_LIMIT_LIKE_ORDER = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
-			+ "company.id company_id, company.name company_name"
-			+ " from computer left join company on computer.company_id = company.id "
-			+ "where computer.name like :computer_name or company.name like :company_name order by :order_by limit :jump,:return;";
-
-	private static final String COMPUTERS_LIMIT_LIKE = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
-			+ "company.id company_id, company.name company_name"
-			+ " from computer left join company on computer.company_id = company.id "
-			+ "where computer.name like :computer_name or company.name like :company_name limit :jump,:return;";
-
-	private static final String COMPUTERS_LIMIT_ORDER = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
-			+ "company.id company_id, company.name company_name"
-			+ " from computer left join company on computer.company_id = company.id "
-			+ "order by :order_by limit :jump,:return;";
-
-	private static final String COMPUTERS_LIMIT = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
-			+ "company.id company_id, company.name company_name"
-			+ " from computer left join company on computer.company_id = company.id " + "limit :jump,:return;";
-
-	private static final String COMPUTERS_LIKE = "select count(computer.id)"
-			+ " from computer left join company on computer.company_id = company.id "
-			+ "where computer.name like :computer_name or company.name like :company_name;";
-
-	private static final String COMPUTERS = "select count(computer.id)"
-			+ " from computer left join company on computer.company_id = company.id;";
 
 	/**
 	 * look for all computers
@@ -63,10 +39,12 @@ public class DAOComputer {
 	 */
 	public List<Computer> findAll() {
 		List<Computer> computers = null;
-		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
-				+ "company.id company_id, company.name company_name from computer join company on computer.company_id = company.id;";
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		computers = jdbcTemplate.query(request, new ComputerRowMapper());
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Computer> criteria = builder.createQuery(Computer.class);
+		Root<Computer> computerRoot = criteria.from(Computer.class);
+		computerRoot.join("company", JoinType.LEFT);
+		criteria.select(computerRoot);
+		computers = entityManager.createQuery(criteria).getResultList();
 		return computers;
 	}
 
@@ -77,9 +55,11 @@ public class DAOComputer {
 	 */
 	public int getNbComputers() {
 		int nbComputers = 0;
-		String request = "select count(id) from computer;";
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		nbComputers = jdbcTemplate.queryForObject(request, Integer.class);
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
+		Root<Computer> computerRoot = criteria.from(Computer.class);
+		criteria.multiselect(builder.count(computerRoot.get("id")));
+		nbComputers = entityManager.createQuery(criteria).getSingleResult().intValue();
 		return nbComputers;
 	}
 
@@ -91,13 +71,13 @@ public class DAOComputer {
 	 */
 	public void findComputersPages(Page<Computer> page) {
 		List<Computer> computers = null;
-		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
-				+ "company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id limit :jump,:return;";
-		NamedParameterJdbcTemplate parameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-		MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-		parameterSource.addValue("jump", page.getNbRowsJumped());
-		parameterSource.addValue("return", Page.getNbRowsReturned());
-		computers = parameterJdbcTemplate.query(request, parameterSource, new ComputerRowMapper());
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Computer> criteria = builder.createQuery(Computer.class);
+		Root<Computer> computerRoot = criteria.from(Computer.class);
+		computerRoot.join("company", JoinType.LEFT);
+		criteria.select(computerRoot);
+		computers = entityManager.createQuery(criteria).setFirstResult(page.getNbRowsJumped())
+				.setMaxResults(Page.getNbRowsReturned()).getResultList();
 		page.setEntities(computers);
 		page.setNbComputerFound(getNbComputers());
 	}
@@ -111,117 +91,95 @@ public class DAOComputer {
 	 */
 	public Computer findById(long computerId) throws NoResultException {
 		Computer computer = null;
-		String request = "select computer.id, computer.name computer_name, computer.introduced, computer.discontinued, "
-				+ "company.id company_id, company.name company_name from computer left join company on computer.company_id = company.id where computer.id = :id;";
-		NamedParameterJdbcTemplate parameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-		MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-		parameterSource.addValue("id", computerId);
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Computer> criteria = builder.createQuery(Computer.class);
+		Root<Computer> computerRoot = criteria.from(Computer.class);
+		computerRoot.join("company", JoinType.LEFT);
+		criteria.select(computerRoot);
+		criteria.where(builder.equal(computerRoot.get("id"), computerId));
 		try {
-			computer = parameterJdbcTemplate.queryForObject(request, parameterSource, new ComputerRowMapper());
-		} catch (EmptyResultDataAccessException e) {
+			computer = entityManager.createQuery(criteria).getSingleResult();
+		} catch (javax.persistence.NoResultException e) {
 			throw new NoResultException();
 		}
 		return computer;
 	}
 
+	@Transactional
 	public void createComputer(Computer computer) {
-		String request = "insert into computer(name, introduced, discontinued, company_id) values(:name, :introduced, :discontinued, :company_id);";
-		NamedParameterJdbcTemplate parameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-		MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-		parameterSource.addValue("name", computer.getName());
-		parameterSource.addValue("introduced", DateMapper.sqlDateFromLocalDate(computer.getIntroduced()));
-		parameterSource.addValue("discontinued", DateMapper.sqlDateFromLocalDate(computer.getDiscontinued()));
-		if (computer.getCompany() == null) {
-			parameterSource.addValue("company_id", null);
-		} else {
-			parameterSource.addValue("company_id", computer.getCompany().getId());
-		}
-		parameterJdbcTemplate.update(request, parameterSource);
+		entityManager.persist(computer);
 	}
 
+	@Transactional
 	public void updateComputer(Computer computer) {
-		String request = "update computer set name=:name, introduced=:introduced, discontinued=:discontinued, company_id=:company_id where id=:id;";
-		NamedParameterJdbcTemplate parameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-		MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-		parameterSource.addValue("name", computer.getName());
-		parameterSource.addValue("introduced", DateMapper.sqlDateFromLocalDate(computer.getIntroduced()));
-		parameterSource.addValue("discontinued", DateMapper.sqlDateFromLocalDate(computer.getDiscontinued()));
-		if (computer.getCompany() == null) {
-			parameterSource.addValue("company_id", null);
-		} else {
-			parameterSource.addValue("company_id", computer.getCompany().getId());
-		}
-		parameterSource.addValue("id", computer.getId());
-		parameterJdbcTemplate.update(request, parameterSource);
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaUpdate<Computer> criteria = builder.createCriteriaUpdate(Computer.class);
+		Root<Computer> computerRoot = criteria.from(Computer.class);
+		criteria.set("name", computer.getName());
+		criteria.set("introduced", computer.getIntroduced());
+		criteria.set("discontinued", computer.getDiscontinued());
+		criteria.set("company", computer.getCompany());
+		criteria.where(builder.equal(computerRoot.get("id"), computer.getId()));
+		entityManager.createQuery(criteria).executeUpdate();
 	}
 
+	@Transactional
 	public void deleteComputerById(long computerId) {
-		String request = "delete from computer where id=:id;";
-		NamedParameterJdbcTemplate parameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-		MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-		parameterSource.addValue("id", computerId);
-		parameterJdbcTemplate.update(request, parameterSource);
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaDelete<Computer> computerCriteria = builder.createCriteriaDelete(Computer.class);
+		Root<Computer> computerRoot = computerCriteria.from(Computer.class);
+		computerCriteria.where(builder.equal(computerRoot.get("id"), computerId));
+		entityManager.createQuery(computerCriteria).executeUpdate();
 	}
 
 	public void findComputersPageSearchOrderBy(Page<Computer> page) {
-		String request = null;
-		if (page.getSearch() != null && !"".equals(page.getSearch())) {
-			if (page.getOrderBy() != null) {
-				request = COMPUTERS_LIMIT_LIKE_ORDER;
-
-			} else {
-				request = COMPUTERS_LIMIT_LIKE;
-			}
-		} else {
-			if (page.getOrderBy() != null) {
-				request = COMPUTERS_LIMIT_ORDER;
-			} else {
-				request = COMPUTERS_LIMIT;
-			}
-		}
 		List<Computer> computers = null;
-		NamedParameterJdbcTemplate parameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-		MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-		fulfillPreparedStatement(parameterSource, page);
-		computers = parameterJdbcTemplate.query(request, parameterSource, new ComputerRowMapper());
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Computer> criteria = builder.createQuery(Computer.class);
+		Root<Computer> computerRoot = criteria.from(Computer.class);
+		Join<Company, Computer> joinCompany = computerRoot.join("company", JoinType.LEFT);
+		criteria.select(computerRoot);
+		if (page.getSearch() != null && !"".equals(page.getSearch())) {
+			Predicate computerName = builder.like(computerRoot.get("name"), page.getSearch());
+			Predicate companyName = builder.like(joinCompany.get("name"), page.getSearch());
+			Predicate like = builder.or(computerName, companyName);
+			criteria.where(like);
+		}
+		if (page.getOrderBy() != null) {
+			if (page.getOrderBy() == OrderBy.COMPANY_NAME) {
+				criteria.orderBy(builder.asc(joinCompany.get(orderMatchAttribute(page.getOrderBy()))));
+			}
+			criteria.orderBy(builder.asc(computerRoot.get(orderMatchAttribute(page.getOrderBy()))));
+		}
+		computers = entityManager.createQuery(criteria).setFirstResult(page.getNbRowsJumped())
+				.setMaxResults(Page.getNbRowsReturned()).getResultList();
 		page.setEntities(computers);
 		page.setNbComputerFound(nbComputersLike(page));
 	}
 
 	private int nbComputersLike(Page<Computer> page) {
-		String request = null;
+		int nbComputers;
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
+		Root<Computer> computerRoot = criteria.from(Computer.class);
+		Join<Company, Computer> joinCompany = computerRoot.join("company", JoinType.LEFT);
 		if (page.getSearch() != null && !"".equals(page.getSearch())) {
-			request = COMPUTERS_LIKE;
-		} else {
-			request = COMPUTERS;
+			Predicate computerName = builder.like(computerRoot.get("name"), page.getSearch());
+			Predicate companyName = builder.like(joinCompany.get("name"), page.getSearch());
+			Predicate like = builder.or(computerName, companyName);
+			criteria.where(like);
 		}
-		NamedParameterJdbcTemplate parameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-		MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-		if (page.getSearch() != null && !"".equals(page.getSearch())) {
-			parameterSource.addValue("computer_name", '%' + page.getSearch() + '%');
-			parameterSource.addValue("company_name", '%' + page.getSearch() + '%');
-		}
-		return parameterJdbcTemplate.queryForObject(request, parameterSource, Integer.class);
+		criteria.multiselect(builder.count(computerRoot.get("id")));
+		nbComputers = entityManager.createQuery(criteria).getSingleResult().intValue();
+		return nbComputers;
 	}
 
-	private void fulfillPreparedStatement(MapSqlParameterSource parameterSource, Page<Computer> page) {
-		parameterSource.addValue("jump", page.getNbRowsJumped());
-		parameterSource.addValue("return", Page.getNbRowsReturned());
-		if (page.getSearch() != null && !"".equals(page.getSearch())) {
-			parameterSource.addValue("computer_name", '%' + page.getSearch() + '%');
-			parameterSource.addValue("company_name", '%' + page.getSearch() + '%');
-		}
-		if (page.getOrderBy() != null) {
-			parameterSource.addValue("order_by", orderMatch(page.getOrderBy()));
-		}
-	}
-
-	private String orderMatch(OrderBy orderBy) {
+	private String orderMatchAttribute(OrderBy orderBy) {
 		switch (orderBy) {
 		case COMPANY_NAME:
-			return "company_name";
+			return "name";
 		case COMPUTER_NAME:
-			return "computer_name";
+			return "name";
 		case DISCONTINUED:
 			return "discontinued";
 		case INTRODUCED:
