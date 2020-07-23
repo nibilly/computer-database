@@ -52,7 +52,7 @@ public class ComputerMapper {
 			computerDTO.setCompanyName(computer.getCompany().getName());
 		} else {
 			computerDTO.setCompanyId("");
-			computerDTO.setCompanyName(computer.getCompany().getName());
+			computerDTO.setCompanyName("");
 		}
 		return computerDTO;
 	}

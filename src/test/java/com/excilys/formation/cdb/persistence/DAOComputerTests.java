@@ -26,6 +26,7 @@ import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
+import com.excilys.formation.cdb.model.OrderBy;
 import com.excilys.formation.cdb.model.Page;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -171,4 +172,36 @@ public class DAOComputerTests extends DBTestCase {
 		assertEquals(true, isSuppresed);
 	}
 
+	@Test
+	public void testFindComputersPageSearchOrderBy() {
+		Page<Computer> page = new Page<Computer>(1, 0);
+		daoComputer.findComputersPageSearchOrderBy(page);
+		assertEquals(4, page.getEntities().size());
+	}
+
+	@Test
+	public void testFindComputersPageOrderBy() {
+		Page<Computer> page = new Page<Computer>(1, 1);
+		page.setOrderBy(OrderBy.COMPUTER_NAME);
+		daoComputer.findComputersPageSearchOrderBy(page);
+		assertEquals(3, page.getEntities().size());
+	}
+
+	@Test
+	public void testFindComputersPageSearch() {
+		Page<Computer> page = new Page<Computer>(1, 0);
+		page.setSearch("un");
+		daoComputer.findComputersPageSearchOrderBy(page);
+		assertEquals(1, page.getEntities().size());
+		return;
+	}
+
+	@Test
+	public void testFindComputersPageFull() {
+		Page<Computer> page = new Page<Computer>(1, 0);
+		page.setOrderBy(OrderBy.COMPANY_NAME);
+		page.setSearch("a");
+		daoComputer.findComputersPageSearchOrderBy(page);
+		assertEquals(3, page.getEntities().size());
+	}
 }

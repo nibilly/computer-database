@@ -63,7 +63,6 @@ public class DashboardController {
 			}
 		}
 		page.setOrderBy(orderBy);
-
 		listComputers(model, page, dashboardDTO);
 		model.addAttribute("page", page);
 		int nbComputers = page.getNbComputerFound();

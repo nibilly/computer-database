@@ -140,16 +140,17 @@ public class DAOComputer {
 		Join<Company, Computer> joinCompany = computerRoot.join("company", JoinType.LEFT);
 		criteria.select(computerRoot);
 		if (page.getSearch() != null && !"".equals(page.getSearch())) {
-			Predicate computerName = builder.like(computerRoot.get("name"), page.getSearch());
-			Predicate companyName = builder.like(joinCompany.get("name"), page.getSearch());
+			Predicate computerName = builder.like(computerRoot.get("name"), "%" + page.getSearch() + "%");
+			Predicate companyName = builder.like(joinCompany.get("name"), "%" + page.getSearch() + "%");
 			Predicate like = builder.or(computerName, companyName);
 			criteria.where(like);
 		}
 		if (page.getOrderBy() != null) {
 			if (page.getOrderBy() == OrderBy.COMPANY_NAME) {
 				criteria.orderBy(builder.asc(joinCompany.get(orderMatchAttribute(page.getOrderBy()))));
+			} else {
+				criteria.orderBy(builder.asc(computerRoot.get(orderMatchAttribute(page.getOrderBy()))));
 			}
-			criteria.orderBy(builder.asc(computerRoot.get(orderMatchAttribute(page.getOrderBy()))));
 		}
 		computers = entityManager.createQuery(criteria).setFirstResult(page.getNbRowsJumped())
 				.setMaxResults(Page.getNbRowsReturned()).getResultList();
@@ -164,8 +165,8 @@ public class DAOComputer {
 		Root<Computer> computerRoot = criteria.from(Computer.class);
 		Join<Company, Computer> joinCompany = computerRoot.join("company", JoinType.LEFT);
 		if (page.getSearch() != null && !"".equals(page.getSearch())) {
-			Predicate computerName = builder.like(computerRoot.get("name"), page.getSearch());
-			Predicate companyName = builder.like(joinCompany.get("name"), page.getSearch());
+			Predicate computerName = builder.like(computerRoot.get("name"), "%" + page.getSearch() + "%");
+			Predicate companyName = builder.like(joinCompany.get("name"), "%" + page.getSearch() + "%");
 			Predicate like = builder.or(computerName, companyName);
 			criteria.where(like);
 		}

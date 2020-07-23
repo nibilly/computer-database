@@ -50,6 +50,7 @@ public class AddComputerController {
 		Validation validation = ComputerValidation.validation(computerDTO, computer);
 		if (validation != Validation.NO_ERROR) {
 			model.addAttribute("error", validation);
+			return new RedirectView("add-computer");
 		} else {
 			computerService.createComputer(computer);
 		}
