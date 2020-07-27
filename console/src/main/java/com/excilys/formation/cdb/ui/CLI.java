@@ -7,8 +7,9 @@ import java.util.Scanner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
@@ -24,15 +25,21 @@ import com.excilys.formation.cdb.service.ComputerService;
  */
 public class CLI {
 	private static Logger logger = LoggerFactory.getLogger(CLI.class);
-	private static Scanner scanner;
-	private static DateTimeFormatter dateTimeFormatter;
-	private static boolean continuerMenu;
-	private static boolean continuerPageRequest;
+	private Scanner scanner;
+	private DateTimeFormatter dateTimeFormatter;
+	private boolean continuerMenu;
+	private boolean continuerPageRequest;
 
-	private static ComputerService computerService = (ComputerService) ContextFactory.getApplicationContext()
-			.getBean("computerService");
-	private static CompanyService companyService = (CompanyService) ContextFactory.getApplicationContext()
-			.getBean("companyService");
+	private ComputerService computerService;
+	private CompanyService companyService;
+
+	public void setComputerService(ComputerService computerService) {
+		this.computerService = computerService;
+	}
+
+	public void setCompanyService(CompanyService companyService) {
+		this.companyService = companyService;
+	}
 
 	/**
 	 * Create a scanner, while user continue to respond call menu else close scanner
@@ -40,6 +47,12 @@ public class CLI {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		ApplicationContext app = new ClassPathXmlApplicationContext("console-beans.xml");
+		CLI cli = (CLI) app.getBean("CLI");
+		cli.moteur();
+	}
+
+	public void moteur() {
 		logger.info("Début CLI");
 		dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		scanner = new Scanner(System.in);
@@ -54,7 +67,7 @@ public class CLI {
 	/**
 	 * Print the menu. User choice call a function or stop the program
 	 */
-	private static void menu() {
+	private void menu() {
 
 		System.out.println("--------CLI---------");// 20 characters
 		System.out.println("0)Quit");
@@ -99,7 +112,7 @@ public class CLI {
 		}
 	}
 
-	private static void deleteCompany() {
+	private void deleteCompany() {
 		System.out.println("--Delete a company--");
 		boolean continuer;
 		Company company;
@@ -121,13 +134,13 @@ public class CLI {
 		}
 	}
 
-	private static void deleteComputer() {
+	private void deleteComputer() {
 		System.out.println("-Delete a computer--");
 		long computerId = askComputerId();// this method already ask for validation
 		computerService.deleteComputerById(computerId);
 	}
 
-	private static void updateComputer() {
+	private void updateComputer() {
 		System.out.println("-Update a computer--");
 		long computerId = askComputerId();
 		System.out.println("New informations for this computer: ");
@@ -136,7 +149,7 @@ public class CLI {
 		computerService.updateComputer(computer);
 	}
 
-	private static void createComputer() {
+	private void createComputer() {
 		System.out.println("-Create a computer--");
 		Computer computer = askComputerInformations();
 		computerService.createComputer(computer);
@@ -147,7 +160,7 @@ public class CLI {
 	 * 
 	 * @return a computer without id
 	 */
-	private static Computer askComputerInformations() {
+	private Computer askComputerInformations() {
 		boolean continuer;
 		String name = null;
 		String introduced = null;
@@ -213,7 +226,7 @@ public class CLI {
 	 * 
 	 * @return the computer corresponding
 	 */
-	private static long askComputerId() {
+	private long askComputerId() {
 		boolean computerExist;
 		boolean incorrectComputer;
 		long computerIdLong = 0l;
@@ -248,12 +261,12 @@ public class CLI {
 		return computer.getId();
 	}
 
-	private static void computerDetails() {
+	private void computerDetails() {
 		System.out.println("--Computer Details--");
 		askComputerId();// It ask validation with details
 	}
 
-	private static void computerListing() {
+	private void computerListing() {
 		System.out.println("---List computers---");
 		int nbRowsJumped = 0;
 		Page<Computer> actualPage = new Page<Computer>(1, nbRowsJumped);
@@ -286,7 +299,7 @@ public class CLI {
 		System.out.println("END of listing");
 	}
 
-	private static int pageRequest(int nbPages, @SuppressWarnings("rawtypes") Page actualPage) {
+	private int pageRequest(int nbPages, @SuppressWarnings("rawtypes") Page actualPage) {
 		int pageRequested = 0;
 		System.out.print("Page " + actualPage.getPageNumber() + "/" + nbPages);
 		System.out.print(". Which page do you want ('n' for next, '0' to stop or a number)?");
@@ -315,7 +328,7 @@ public class CLI {
 		return pageRequested;
 	}
 
-	private static void companyListing() {
+	private void companyListing() {
 		System.out.println("---List companies---");
 
 		int nbRowsJumped = 0;
