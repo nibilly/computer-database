@@ -13,17 +13,32 @@
     http://www.springframework.org/schema/context 
     http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-	<bean id="computerService"
-		class="com.excilys.formation.cdb.service.ComputerService">
-		<property name="daoComputer">
-			<ref bean="daoComputer"/>
-		</property>
+	<import resource="classpath:service-beans.xml"/>
+
+	<bean id="addComputerController"
+		class="com.excilys.formation.cdb.controller.AddComputerController">
+		<constructor-arg>
+			<ref bean="computerService"/>
+		</constructor-arg>
+		<constructor-arg>
+			<ref bean="companyService"/>
+		</constructor-arg>
 	</bean>
 
-	<bean id="companyService"
-		class="com.excilys.formation.cdb.service.CompanyService">
-		<property name="daoCompany">
-			<ref bean="daoCompany"/>
-		</property>
+	<bean id="dashboardController"
+		class="com.excilys.formation.cdb.controller.DashboardController">
+		<constructor-arg>
+			<ref bean="computerService"/>
+		</constructor-arg>
+	</bean>
+
+	<bean id="editComputerController"
+		class="com.excilys.formation.cdb.controller.EditComputerController">
+		<constructor-arg>
+			<ref bean="computerService"/>
+		</constructor-arg>
+		<constructor-arg>
+			<ref bean="companyService"/>
+		</constructor-arg>
 	</bean>
 </beans> 
