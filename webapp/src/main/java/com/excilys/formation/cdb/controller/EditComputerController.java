@@ -25,11 +25,15 @@ public class EditComputerController {
 
 	private CompanyService companyService;
 
+	private ComputerValidation computerValidation;
+
 	private static boolean postFulFill = false;
 
-	public EditComputerController(ComputerService computerService, CompanyService companyService) {
+	public EditComputerController(ComputerService computerService, CompanyService companyService,
+			ComputerValidation computerValidation) {
 		this.computerService = computerService;
 		this.companyService = companyService;
+		this.computerValidation = computerValidation;
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -54,7 +58,7 @@ public class EditComputerController {
 	@RequestMapping(method = RequestMethod.POST)
 	public RedirectView update(ComputerDTO computerDTO, ModelMap model) {
 		Computer computer = new Computer();
-		Validation validation = ComputerValidation.editValidation(computerDTO, computer);
+		Validation validation = computerValidation.editValidation(computerDTO, computer);
 		if (validation == Validation.NO_ERROR) {
 			computerService.updateComputer(computer);
 			return new RedirectView("dashboard");

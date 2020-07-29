@@ -11,4 +11,8 @@
 	<computer id='3' name='CM-200' company_id='2' />
 
 	<computer id='4' name='CM-5e' />
+	
+	<users username="user" password="1234" enabled="true"/>
+	
+	<authorities username="user" authority="ROLE_USER"/>
 </dataset>

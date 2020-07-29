@@ -28,4 +28,10 @@
 			<ref bean="daoCompany"/>
 		</property>
 	</bean>
+	
+	<bean id="userService" class="com.excilys.formation.cdb.service.UserService">
+		<constructor-arg name="daoUser" >
+			<ref bean="daoUser"/>
+		</constructor-arg>
+	</bean>
 </beans> 

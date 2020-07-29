@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import com.excilys.formation.cdb.exception.NoResultException;
 import com.excilys.formation.cdb.model.Company;
@@ -17,7 +16,6 @@ import com.excilys.formation.cdb.persistence.DAOCompany;
  * @author nbilly
  *
  */
-@Service
 public class CompanyService {
 	private static Logger logger = LoggerFactory.getLogger(CompanyService.class);
 

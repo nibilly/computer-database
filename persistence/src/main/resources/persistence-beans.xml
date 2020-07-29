@@ -72,6 +72,17 @@
 		</property>
 	</bean>
 
+	<bean id="daoUser"
+		class="com.excilys.formation.cdb.persistence.DAOUser">
+		<property name="entityManager">
+			<bean
+				class="org.springframework.orm.jpa.support.SharedEntityManagerBean">
+				<property name="entityManagerFactory"
+					ref="entityManagerFactory" />
+			</bean>
+		</property>
+	</bean>
+
 	<bean id="transactionManager"
 		class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory"

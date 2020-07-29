@@ -25,9 +25,13 @@ public class AddComputerController {
 
 	private CompanyService companyService;
 
-	public AddComputerController(ComputerService computerService, CompanyService companyService) {
-		this.companyService = companyService;
+	private ComputerValidation computerValidation;
+
+	public AddComputerController(ComputerService computerService, CompanyService companyService,
+			ComputerValidation computerValidation) {
 		this.computerService = computerService;
+		this.companyService = companyService;
+		this.computerValidation = computerValidation;
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -44,7 +48,7 @@ public class AddComputerController {
 	@RequestMapping(method = RequestMethod.POST)
 	public RedirectView createComputer(ComputerDTO computerDTO, ModelMap model) {
 		Computer computer = new Computer();
-		Validation validation = ComputerValidation.validation(computerDTO, computer);
+		Validation validation = computerValidation.validation(computerDTO, computer);
 		if (validation != Validation.NO_ERROR) {
 			model.addAttribute("error", validation);
 			return new RedirectView("add-computer");

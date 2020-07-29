@@ -3,7 +3,6 @@ package com.excilys.formation.cdb.validation;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-import com.excilys.formation.cdb.config.ContextFactory;
 import com.excilys.formation.cdb.dto.ComputerDTO;
 import com.excilys.formation.cdb.mapper.DateMapper;
 import com.excilys.formation.cdb.model.Company;
@@ -12,12 +11,15 @@ import com.excilys.formation.cdb.service.CompanyService;
 import com.excilys.formation.cdb.service.ComputerService;
 
 public class ComputerValidation {
-	private static ComputerService computerService = (ComputerService) ContextFactory.getApplicationContext()
-			.getBean("computerService");
-	private static CompanyService companyService = (CompanyService) ContextFactory.getApplicationContext()
-			.getBean("companyService");
+	private ComputerService computerService;
+	private CompanyService companyService;
 
-	public static Validation validation(ComputerDTO computerDTO, Computer computer) {
+	public ComputerValidation(ComputerService computerService, CompanyService companyService) {
+		this.computerService = computerService;
+		this.companyService = companyService;
+	}
+
+	public Validation validation(ComputerDTO computerDTO, Computer computer) {
 		Validation validation = Validation.NO_ERROR;
 		LocalDate introducedDate;
 		LocalDate discontinuedDate;
@@ -62,13 +64,13 @@ public class ComputerValidation {
 		return validation;
 	}
 
-	public static Validation editValidation(ComputerDTO computerDTO, Computer computer) {
+	public Validation editValidation(ComputerDTO computerDTO, Computer computer) {
 		Validation validation = Validation.NO_ERROR;
 		try {
 			long idLong = Long.parseLong(computerDTO.getId());
 			if (idLong > 0 && idLong < computerService.getNbComputers()) {
 				computer.setId(idLong);
-				validation = ComputerValidation.validation(computerDTO, computer);
+				validation = validation(computerDTO, computer);
 			} else {
 				throw new NumberFormatException();
 			}
