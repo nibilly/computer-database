@@ -89,7 +89,7 @@ public class DAOCompany {
 		Path<String> namePath = companyRoot.get("name");
 		criteria.multiselect(idPath, namePath);
 		companies = entityManager.createQuery(criteria).setFirstResult(page.getNbRowsJumped())
-				.setMaxResults(Page.getNbRowsReturned()).getResultList();
+				.setMaxResults(page.getNbRowsReturned()).getResultList();
 		page.setEntities(companies);
 	}
 

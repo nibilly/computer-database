@@ -43,7 +43,7 @@ public class ComputerValidation {
 						}
 					}
 					try {
-						companyIdLong = Long.parseLong(computerDTO.getCompanyId());
+						companyIdLong = Long.parseLong(computerDTO.getCompanyDTO().getId());
 						if (companyIdLong > -1 && companyIdLong < companyService.getNbCompanies()) {
 							Company company = companyService.findById(companyIdLong);
 							computer.setCompany(company);
@@ -64,6 +64,13 @@ public class ComputerValidation {
 		return validation;
 	}
 
+	/**
+	 * Verif id
+	 * 
+	 * @param computerDTO
+	 * @param computer
+	 * @return
+	 */
 	public Validation editValidation(ComputerDTO computerDTO, Computer computer) {
 		Validation validation = Validation.NO_ERROR;
 		try {

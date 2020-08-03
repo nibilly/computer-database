@@ -111,10 +111,10 @@ public class DAOCompanyTests extends DBTestCase {
 
 	@Test
 	public void testFindAllPages() {
-		Page<Company> page = new Page<Company>(1, 1);
+		Page<Company> page = new Page<Company>(0);
 		daoCompany.findAllPages(page);
-		assertEquals(1, page.getEntities().size());
-		Company company = page.getEntities().get(0);
+		assertEquals(2, page.getEntities().size());
+		Company company = page.getEntities().get(1);
 		assertEquals(2, company.getId());
 		assertEquals("Thinking Machines", company.getName());
 	}

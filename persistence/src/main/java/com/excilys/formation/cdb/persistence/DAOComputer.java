@@ -77,7 +77,7 @@ public class DAOComputer {
 		computerRoot.join("company", JoinType.LEFT);
 		criteria.select(computerRoot);
 		computers = entityManager.createQuery(criteria).setFirstResult(page.getNbRowsJumped())
-				.setMaxResults(Page.getNbRowsReturned()).getResultList();
+				.setMaxResults(page.getNbRowsReturned()).getResultList();
 		page.setEntities(computers);
 		page.setNbComputerFound(getNbComputers());
 	}
@@ -153,7 +153,7 @@ public class DAOComputer {
 			}
 		}
 		computers = entityManager.createQuery(criteria).setFirstResult(page.getNbRowsJumped())
-				.setMaxResults(Page.getNbRowsReturned()).getResultList();
+				.setMaxResults(page.getNbRowsReturned()).getResultList();
 		page.setEntities(computers);
 		page.setNbComputerFound(nbComputersLike(page));
 	}

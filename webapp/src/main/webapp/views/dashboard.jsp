@@ -30,9 +30,10 @@
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
 					<form id="searchForm" action="dashboard" method="GET" class="form-inline">
-
+						<input type="hidden" name="nbRowsReturned" value="${nbRowsReturned}" />
 						<input type="search" id="searchbox" name="search"
-							class="form-control" placeholder="Search name" /> <input
+							class="form-control" placeholder="Search name" /> 
+						<input
 							type="submit" id="searchsubmit" value="Filter by name"
 							class="btn btn-primary" />
 					</form>
@@ -63,12 +64,12 @@
 									class="fa fa-trash-o fa-lg"></i>
 							</a>
 						</span></th>
-						<th><a href="dashboard?search=${search}&page=1&orderBy=computer">Computer name</a></th>
-						<th><a href="dashboard?search=${search}&page=1&orderBy=introduced">Introduced date</a></th>
+						<th><a href="dashboard?search=${search}&page=1&orderBy=computer&nbRowsReturned=${nbRowsReturned}">Computer name</a></th>
+						<th><a href="dashboard?search=${search}&page=1&orderBy=introduced&nbRowsReturned=${nbRowsReturned}">Introduced date</a></th>
 						<!-- Table header for Discontinued Date -->
-						<th><a href="dashboard?search=${search}&page=1&orderBy=discontinued">Discontinued date</a></th>
+						<th><a href="dashboard?search=${search}&page=1&orderBy=discontinued&nbRowsReturned=${nbRowsReturned}">Discontinued date</a></th>
 						<!-- Table header for Company -->
-						<th><a href="dashboard?search=${search}&page=1&orderBy=company">Company</a></th>
+						<th><a href="dashboard?search=${search}&page=1&orderBy=company&nbRowsReturned=${nbRowsReturned}">Company</a></th>
 
 					</tr>
 				</thead>
@@ -82,7 +83,7 @@
 										value="${computer.name}" /></a></td>
 							<td><c:out value="${computer.introduced}" /></td>
 							<td><c:out value="${computer.discontinued}" /></td>
-							<td><c:out value="${computer.companyName}" /></td>
+							<td><c:out value="${computer.companyDTO.name}" /></td>
 						</tr>
 					</c:forEach>
 				</tbody>
@@ -93,7 +94,7 @@
 		<div class="container text-center">
 			<ul class="pagination">
 				<c:if test="${page.pageNumber gt 1}">
-					<li><a href="dashboard?search=${search}&page=${page.pageNumber - 1}&orderBy=${orderBy}"
+					<li><a href="dashboard?search=${search}&page=${page.pageNumber - 1}&orderBy=${orderBy}&nbRowsReturned=${nbRowsReturned}"
 						aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
 					</a></li>
 				</c:if>
@@ -111,11 +112,11 @@
 						<c:choose>
 							<c:when test="${(pageIterator + i) eq page.pageNumber }">
 								<li class="active"><a
-									href="dashboard?search=${search}&page=${pageIterator+i}&orderBy=${orderBy}"><c:out
+									href="dashboard?search=${search}&page=${pageIterator+i}&orderBy=${orderBy}&nbRowsReturned=${nbRowsReturned}"><c:out
 											value="${pageIterator+i}"></c:out></a></li>
 							</c:when>
 							<c:otherwise>
-								<li><a href="dashboard?search=${search}&page=${pageIterator+i}&orderBy=${orderBy}"><c:out
+								<li><a href="dashboard?search=${search}&page=${pageIterator+i}&orderBy=${orderBy}&nbRowsReturned=${nbRowsReturned}"><c:out
 											value="${pageIterator+i}"></c:out></a></li>
 							</c:otherwise>
 						</c:choose>
@@ -123,7 +124,7 @@
 				</c:forEach>
 
 				<c:if test="${page.pageNumber lt nbPages}">
-					<li><a href="dashboard?search=${search}&page=${page.pageNumber + 1}&orderBy=${orderBy}"
+					<li><a href="dashboard?search=${search}&page=${page.pageNumber + 1}&orderBy=${orderBy}&nbRowsReturned=${nbRowsReturned}"
 						aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 					</a></li>
 				</c:if>

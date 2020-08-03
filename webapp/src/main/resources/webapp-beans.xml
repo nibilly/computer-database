@@ -16,7 +16,7 @@
 	<import resource="classpath:service-beans.xml" />
 
 	<bean id="addComputerController"
-		class="com.excilys.formation.cdb.controller.AddComputerController">
+		class="com.excilys.formation.cdb.ui.AddComputerController">
 		<constructor-arg name="computerService">
 			<ref bean="computerService" />
 		</constructor-arg>
@@ -29,14 +29,14 @@
 	</bean>
 
 	<bean id="dashboardController"
-		class="com.excilys.formation.cdb.controller.DashboardController">
+		class="com.excilys.formation.cdb.ui.DashboardController">
 		<constructor-arg>
 			<ref bean="computerService" />
 		</constructor-arg>
 	</bean>
 
 	<bean id="editComputerController"
-		class="com.excilys.formation.cdb.controller.EditComputerController">
+		class="com.excilys.formation.cdb.ui.EditComputerController">
 		<constructor-arg name="computerService">
 			<ref bean="computerService" />
 		</constructor-arg>
@@ -53,6 +53,23 @@
 		<constructor-arg name="computerService">
 			<ref bean="computerService" />
 		</constructor-arg>
+		<constructor-arg name="companyService">
+			<ref bean="companyService" />
+		</constructor-arg>
+	</bean>
+	
+	<bean id="computerController"
+		class="com.excilys.formation.cdb.api.ComputerController">
+		<constructor-arg name="computerService">
+			<ref bean="computerService" />
+		</constructor-arg>
+		<property name="computerValidation">
+			<ref bean="computerValidation" />
+		</property>
+	</bean>
+	
+	<bean id="companyController"
+		class="com.excilys.formation.cdb.api.CompanyController">
 		<constructor-arg name="companyService">
 			<ref bean="companyService" />
 		</constructor-arg>

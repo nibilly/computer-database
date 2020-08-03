@@ -1,4 +1,4 @@
-package com.excilys.formation.cdb.controller;
+package com.excilys.formation.cdb.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.excilys.formation.cdb.dto.CompanyDTO;
@@ -18,16 +19,17 @@ import com.excilys.formation.cdb.service.ComputerService;
 import com.excilys.formation.cdb.validation.ComputerValidation;
 import com.excilys.formation.cdb.validation.Validation;
 
-@RequestMapping("/add-computer")
-public class AddComputerController {
-
+@RequestMapping("/editComputer")
+public class EditComputerController {
 	private ComputerService computerService;
 
 	private CompanyService companyService;
 
 	private ComputerValidation computerValidation;
 
-	public AddComputerController(ComputerService computerService, CompanyService companyService,
+	private static boolean postFulFill = false;
+
+	public EditComputerController(ComputerService computerService, CompanyService companyService,
 			ComputerValidation computerValidation) {
 		this.computerService = computerService;
 		this.companyService = companyService;
@@ -35,26 +37,36 @@ public class AddComputerController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String displayAdd(ModelMap model) {
+	public String displayEdit(@RequestParam("computerId") String computerId, ModelMap model) {
+		if (!postFulFill) {
+			fulfillModel(computerId, model);
+		}
+		postFulFill = false;
+		return "editComputer";
+	}
+
+	private void fulfillModel(String computerId, ModelMap model) {
 		List<Company> companies = companyService.findAll();
 		List<CompanyDTO> companiesDTO = new ArrayList<CompanyDTO>();
 		for (Company company : companies) {
 			companiesDTO.add(CompanyMapper.mapCompanyDTO(company));
 		}
+		model.addAttribute("computerId", computerId);
 		model.addAttribute("companies", companiesDTO);
-		return "addComputer";
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public RedirectView createComputer(ComputerDTO computerDTO, ModelMap model) {
+	public RedirectView update(ComputerDTO computerDTO, ModelMap model) {
 		Computer computer = new Computer();
-		Validation validation = computerValidation.validation(computerDTO, computer);
-		if (validation != Validation.NO_ERROR) {
-			model.addAttribute("error", validation);
-			return new RedirectView("add-computer");
+		Validation validation = computerValidation.editValidation(computerDTO, computer);
+		if (validation == Validation.NO_ERROR) {
+			computerService.updateComputer(computer);
+			return new RedirectView("dashboard");
 		} else {
-			computerService.createComputer(computer);
+			fulfillModel(computerDTO.getId(), model);
+			model.addAttribute("error", validation);
+			postFulFill = true;
 		}
-		return new RedirectView("dashboard");
+		return new RedirectView("editComputer");
 	}
 }

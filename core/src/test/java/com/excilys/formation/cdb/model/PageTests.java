@@ -32,7 +32,7 @@ public class PageTests {
 	public void testConstructorComputerFull() {
 		Page<Computer> page = new Page<Computer>(1, 10);
 		page.setEntities(computers);
-		assertEquals(1, page.getPageNumber());
+		assertEquals(1, page.getPageIndex());
 		assertEquals(10, page.getNbRowsJumped());
 		assertEquals(computers.get(0), page.getEntities().get(0));
 		assertEquals(computers.get(1), page.getEntities().get(1));
@@ -42,9 +42,9 @@ public class PageTests {
 	public void testSettersComputer() {
 		Page<Computer> page = new Page<Computer>();
 		page.setNbRowsJumped(10);
-		page.setPageNumber(1);
+		page.setPageIndex(1);
 		page.setEntities(computers);
-		assertEquals(1, page.getPageNumber());
+		assertEquals(1, page.getPageIndex());
 		assertEquals(10, page.getNbRowsJumped());
 		assertEquals(computers.get(0), page.getEntities().get(0));
 		assertEquals(computers.get(1), page.getEntities().get(1));
@@ -54,7 +54,7 @@ public class PageTests {
 	public void testConstructorCompanyFull() {
 		Page<Company> page = new Page<Company>(1, 10);
 		page.setEntities(companies);
-		assertEquals(1, page.getPageNumber());
+		assertEquals(1, page.getPageIndex());
 		assertEquals(10, page.getNbRowsJumped());
 		assertEquals(companies.get(0), page.getEntities().get(0));
 		assertEquals(companies.get(1), page.getEntities().get(1));
@@ -64,9 +64,9 @@ public class PageTests {
 	public void testSettersCompany() {
 		Page<Company> page = new Page<Company>();
 		page.setNbRowsJumped(10);
-		page.setPageNumber(1);
+		page.setPageIndex(1);
 		page.setEntities(companies);
-		assertEquals(1, page.getPageNumber());
+		assertEquals(1, page.getPageIndex());
 		assertEquals(10, page.getNbRowsJumped());
 		assertEquals(companies.get(0), page.getEntities().get(0));
 		assertEquals(companies.get(1), page.getEntities().get(1));

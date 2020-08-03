@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import com.excilys.formation.cdb.dto.CompanyDTO;
 import com.excilys.formation.cdb.dto.ComputerDTO;
 import com.excilys.formation.cdb.model.Company;
 import com.excilys.formation.cdb.model.Computer;
@@ -47,13 +48,13 @@ public class ComputerMapper {
 		} else {
 			computerDTO.setDiscontinued("");
 		}
+		CompanyDTO companyDTO;
 		if (computer.getCompany() != null) {
-			computerDTO.setCompanyId(computer.getCompany().getId() + "");
-			computerDTO.setCompanyName(computer.getCompany().getName());
+			companyDTO = new CompanyDTO(computer.getCompany().getId() + "", computer.getCompany().getName());
 		} else {
-			computerDTO.setCompanyId("");
-			computerDTO.setCompanyName("");
+			companyDTO = new CompanyDTO("", "");
 		}
+		computerDTO.setCompanyDTO(companyDTO);
 		return computerDTO;
 	}
 }

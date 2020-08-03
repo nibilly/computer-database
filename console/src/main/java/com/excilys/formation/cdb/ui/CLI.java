@@ -269,7 +269,7 @@ public class CLI {
 	private void computerListing() {
 		System.out.println("---List computers---");
 		int nbRowsJumped = 0;
-		Page<Computer> actualPage = new Page<Computer>(1, nbRowsJumped);
+		Page<Computer> actualPage = new Page<Computer>(0);
 		continuerPageRequest = true;
 		// Page display
 		do {
@@ -284,15 +284,14 @@ public class CLI {
 			// Page request
 			do {
 				int nbComputers = computerService.getNbComputers();
-				int nbPages = nbComputers / Page.getNbRowsReturned();
-				if ((nbComputers % Page.getNbRowsReturned()) > 0) {
+				int nbPages = nbComputers / Page.NB_ROWS_RETURNED_DEFAULT;
+				if ((nbComputers % Page.NB_ROWS_RETURNED_DEFAULT) > 0) {
 					nbPages++;
 				}
 				pageRequested = pageRequest(nbPages, actualPage);
 			} while (pageRequested == 0 && continuerPageRequest);
 			if (continuerPageRequest) {
-				nbRowsJumped = Page.getNbRowsReturned() * (pageRequested - 1);
-				actualPage = new Page<Computer>(pageRequested, nbRowsJumped);
+				actualPage = new Page<Computer>(pageRequested - 1);
 			}
 			System.out.println();
 		} while (continuerPageRequest);
@@ -331,8 +330,7 @@ public class CLI {
 	private void companyListing() {
 		System.out.println("---List companies---");
 
-		int nbRowsJumped = 0;
-		Page<Company> actualPage = new Page<Company>(1, nbRowsJumped);
+		Page<Company> actualPage = new Page<Company>(0);
 		continuerPageRequest = true;
 		// Page display
 		do {
@@ -347,15 +345,14 @@ public class CLI {
 			// Page request
 			do {
 				int nbCompanies = companyService.getNbCompanies();
-				int nbPages = nbCompanies / Page.getNbRowsReturned();
-				if ((nbCompanies % Page.getNbRowsReturned()) > 0) {
+				int nbPages = nbCompanies / Page.NB_ROWS_RETURNED_DEFAULT;
+				if ((nbCompanies % Page.NB_ROWS_RETURNED_DEFAULT) > 0) {
 					nbPages++;
 				}
 				pageRequested = pageRequest(nbPages, actualPage);
 			} while (pageRequested == 0 && continuerPageRequest);
 			if (continuerPageRequest) {
-				nbRowsJumped = Page.getNbRowsReturned() * (pageRequested - 1);
-				actualPage = new Page<Company>(pageRequested, nbRowsJumped);
+				actualPage = new Page<Company>(pageRequested - 1);
 			}
 			System.out.println();
 		} while (continuerPageRequest);

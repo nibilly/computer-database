@@ -94,9 +94,9 @@ public class DAOComputerTests extends DBTestCase {
 
 	@Test
 	public void testFindComputersPages() {
-		Page<Computer> page = new Page<Computer>(1, 1);
+		Page<Computer> page = new Page<Computer>(0);
 		daoComputer.findComputersPages(page);
-		assertEquals(3, page.getEntities().size());
+		assertEquals(4, page.getEntities().size());
 	}
 
 	@Test
@@ -174,22 +174,22 @@ public class DAOComputerTests extends DBTestCase {
 
 	@Test
 	public void testFindComputersPageSearchOrderBy() {
-		Page<Computer> page = new Page<Computer>(1, 0);
+		Page<Computer> page = new Page<Computer>(0);
 		daoComputer.findComputersPageSearchOrderBy(page);
 		assertEquals(4, page.getEntities().size());
 	}
 
 	@Test
 	public void testFindComputersPageOrderBy() {
-		Page<Computer> page = new Page<Computer>(1, 1);
+		Page<Computer> page = new Page<Computer>(0);
 		page.setOrderBy(OrderBy.COMPUTER_NAME);
 		daoComputer.findComputersPageSearchOrderBy(page);
-		assertEquals(3, page.getEntities().size());
+		assertEquals(4, page.getEntities().size());
 	}
 
 	@Test
 	public void testFindComputersPageSearch() {
-		Page<Computer> page = new Page<Computer>(1, 0);
+		Page<Computer> page = new Page<Computer>(0);
 		page.setSearch("un");
 		daoComputer.findComputersPageSearchOrderBy(page);
 		assertEquals(1, page.getEntities().size());
@@ -198,7 +198,7 @@ public class DAOComputerTests extends DBTestCase {
 
 	@Test
 	public void testFindComputersPageFull() {
-		Page<Computer> page = new Page<Computer>(1, 0);
+		Page<Computer> page = new Page<Computer>(0);
 		page.setOrderBy(OrderBy.COMPANY_NAME);
 		page.setSearch("a");
 		daoComputer.findComputersPageSearchOrderBy(page);

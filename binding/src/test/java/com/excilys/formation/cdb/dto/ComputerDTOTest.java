@@ -14,13 +14,14 @@ public class ComputerDTOTest {
 		String discontinued = "2003-12-31";
 		String companyId = "2";
 		String companyName = "company name";
-		ComputerDTO computerDTO = new ComputerDTO(id, name, introduced, discontinued, companyId, companyName);
+		ComputerDTO computerDTO = new ComputerDTO(id, name, introduced, discontinued,
+				new CompanyDTO(companyId, companyName));
 		assertEquals(id, computerDTO.getId());
 		assertEquals(name, computerDTO.getName());
 		assertEquals(introduced, computerDTO.getIntroduced());
 		assertEquals(discontinued, computerDTO.getDiscontinued());
-		assertEquals(companyId, computerDTO.getCompanyId());
-		assertEquals(companyName, computerDTO.getCompanyName());
+		assertEquals(companyId, computerDTO.getCompanyDTO().getId());
+		assertEquals(companyName, computerDTO.getCompanyDTO().getName());
 	}
 
 	@Test
@@ -36,13 +37,15 @@ public class ComputerDTOTest {
 		computerDTO.setName(name);
 		computerDTO.setIntroduced(introduced);
 		computerDTO.setDiscontinued(discontinued);
-		computerDTO.setCompanyId(companyId);
-		computerDTO.setCompanyName(companyName);
+		CompanyDTO companyDTO = new CompanyDTO();
+		companyDTO.setId(companyId);
+		companyDTO.setName(companyName);
+		computerDTO.setCompanyDTO(companyDTO);
 		assertEquals(id, computerDTO.getId());
 		assertEquals(name, computerDTO.getName());
 		assertEquals(introduced, computerDTO.getIntroduced());
 		assertEquals(discontinued, computerDTO.getDiscontinued());
-		assertEquals(companyId, computerDTO.getCompanyId());
-		assertEquals(companyName, computerDTO.getCompanyName());
+		assertEquals(companyId, computerDTO.getCompanyDTO().getId());
+		assertEquals(companyName, computerDTO.getCompanyDTO().getName());
 	}
 }

@@ -12,10 +12,12 @@ public class Page<T> {
 	/**
 	 * number of rows per list
 	 */
-	private static int nbRowsReturned = 10;
+	private int nbRowsReturned;
+	public static final int NB_ROWS_RETURNED_DEFAULT = 10;
 	/**
-	 * this page number
+	 * this page index started at 0
 	 */
+	private int pageIndex;
 	private int pageNumber;
 	/**
 	 * list of T
@@ -32,12 +34,16 @@ public class Page<T> {
 
 	private OrderBy orderBy;
 
-	public int getPageNumber() {
-		return this.pageNumber;
+	public int getPageIndex() {
+		return this.pageIndex;
 	}
 
-	public void setPageNumber(int pageNumber) {
-		this.pageNumber = pageNumber;
+	public void setPageIndex(int pageIndex) {
+		this.pageIndex = pageIndex;
+	}
+
+	public int getPageNumber() {
+		return pageIndex + 1;
 	}
 
 	public List<T> getEntities() {
@@ -56,12 +62,12 @@ public class Page<T> {
 		this.nbRowsJumped = nbRowsJumped;
 	}
 
-	public static int getNbRowsReturned() {
+	public int getNbRowsReturned() {
 		return nbRowsReturned;
 	}
 
-	public static void setNbRowsReturned(int nbRowsReturned) {
-		Page.nbRowsReturned = nbRowsReturned;
+	public void setNbRowsReturned(int nbRowsReturned) {
+		this.nbRowsReturned = nbRowsReturned;
 	}
 
 	public int getNbComputerFound() {
@@ -91,8 +97,21 @@ public class Page<T> {
 	public Page() {
 	}
 
-	public Page(int pageNumber, int nbRowsJumped) {
-		this.pageNumber = pageNumber;
-		this.nbRowsJumped = nbRowsJumped;
+	public Page(int pageIndex, int nbRowsReturned) {
+		this.pageIndex = pageIndex;
+		this.nbRowsReturned = nbRowsReturned;
+		this.nbRowsJumped = this.pageIndex * this.nbRowsReturned;
+	}
+
+	/**
+	 * default nbRowsReturned = 10
+	 * 
+	 * @param pageIndex
+	 * @param nbRowsJumped
+	 */
+	public Page(int pageIndex) {
+		this.pageIndex = pageIndex;
+		this.nbRowsReturned = 10;
+		this.nbRowsJumped = this.pageIndex * this.nbRowsReturned;
 	}
 }

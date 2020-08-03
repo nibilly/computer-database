@@ -65,7 +65,7 @@ public class ComputerMapperTests {
 		assertEquals(name, computerDTO.getName());
 		assertEquals(introduced.toString(), computerDTO.getIntroduced());
 		assertEquals(discontinued.toString(), computerDTO.getDiscontinued());
-		assertEquals(companyId + "", computerDTO.getCompanyId());
-		assertEquals(companyName, computerDTO.getCompanyName());
+		assertEquals(companyId + "", computerDTO.getCompanyDTO().getId());
+		assertEquals(companyName, computerDTO.getCompanyDTO().getName());
 	}
 }

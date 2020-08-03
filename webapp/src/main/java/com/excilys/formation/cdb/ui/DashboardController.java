@@ -1,4 +1,4 @@
-package com.excilys.formation.cdb.controller;
+package com.excilys.formation.cdb.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,12 +28,16 @@ public class DashboardController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getDashboard(DashboardDTO dashboardDTO, ModelMap model) {
-		try {
-			int nbRowsReturned1 = Integer.parseInt(dashboardDTO.getNbRowsReturned());
-			Page.setNbRowsReturned(nbRowsReturned1);
-		} catch (NumberFormatException e) {
+		int nbRowsReturned = Page.NB_ROWS_RETURNED_DEFAULT;
+		if (dashboardDTO.getNbRowsReturned() != null) {
+			try {
+				nbRowsReturned = Integer.parseInt(dashboardDTO.getNbRowsReturned());
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
 		}
-		Page<ComputerDTO> page = new Page<ComputerDTO>(1, 0);
+		model.addAttribute("nbRowsReturned", nbRowsReturned);
+		Page<ComputerDTO> page = new Page<ComputerDTO>(0, nbRowsReturned);
 		String search = dashboardDTO.getSearch();
 		model.addAttribute("search", search);
 		page.setSearch(search);
@@ -64,8 +68,8 @@ public class DashboardController {
 		model.addAttribute("page", page);
 		int nbComputers = page.getNbComputerFound();
 		model.addAttribute("nbComputers", nbComputers + "");
-		int nbPages = (nbComputers == 0) ? 1 : nbComputers / Page.getNbRowsReturned();
-		if ((nbComputers % Page.getNbRowsReturned()) > 0) {
+		int nbPages = (nbComputers == 0) ? 1 : nbComputers / nbRowsReturned;
+		if ((nbComputers % nbRowsReturned) > 0) {
 			nbPages++;
 		}
 		model.addAttribute("nbPages", nbPages);
@@ -80,8 +84,7 @@ public class DashboardController {
 		} catch (NumberFormatException e) {
 			pageRequested = 1;
 		}
-		int nbRowsJumped = Page.getNbRowsReturned() * (pageRequested - 1);
-		Page<Computer> page = new Page<Computer>(pageRequested, nbRowsJumped);
+		Page<Computer> page = new Page<Computer>(pageRequested - 1, pageDTO.getNbRowsReturned());
 		page.setSearch(pageDTO.getSearch());
 		page.setOrderBy(pageDTO.getOrderBy());
 		computerService.findComputersPageSearchOrderBy(page);
@@ -89,8 +92,7 @@ public class DashboardController {
 		for (Computer computer : page.getEntities()) {
 			computersDTO.add(ComputerMapper.mapComputerDTO(computer));
 		}
-		pageDTO.setPageNumber(pageRequested);
-		pageDTO.setNbRowsJumped(nbRowsJumped);
+		pageDTO.setPageIndex(pageRequested - 1);
 		pageDTO.setEntities(computersDTO);
 		pageDTO.setNbComputerFound(page.getNbComputerFound());
 	}
